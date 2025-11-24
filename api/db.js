@@ -323,7 +323,7 @@ async function createSchemaAndSeed_vc_bb() {
     DROP PROCEDURE IF EXISTS sp_backup_table_bb_vc;
     CREATE PROCEDURE sp_backup_table_bb_vc(IN p_table VARCHAR(64), IN p_suffix VARCHAR(255))
     BEGIN
-      SET @backup = CONCAT(p_table, '_backup_', p_suffix);
+      SET @backup = LEFT(CONCAT(p_table, '_backup_', p_suffix), 64);
       SET @sql1 = CONCAT('CREATE TABLE IF NOT EXISTS ', @backup, ' LIKE ', p_table);
       PREPARE stmt1 FROM @sql1; EXECUTE stmt1; DEALLOCATE PREPARE stmt1;
       SET @sql2 = CONCAT('TRUNCATE TABLE ', @backup);
@@ -342,7 +342,7 @@ async function createSchemaAndSeed_vc_bb() {
     DROP PROCEDURE IF EXISTS sp_restore_from_backup_bb_vc;
     CREATE PROCEDURE sp_restore_from_backup_bb_vc(IN p_table VARCHAR(64), IN p_suffix VARCHAR(255))
     BEGIN
-      SET @backup = CONCAT(p_table, '_backup_', p_suffix);
+      SET @backup = LEFT(CONCAT(p_table, '_backup_', p_suffix), 64);
       SET @exists = (SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = @backup);
       IF @exists > 0 THEN
         SET @sql1 = CONCAT('DELETE FROM ', p_table);
@@ -457,9 +457,20 @@ export async function execute_vc_bb(sql, params = []) {
   return result; // { affectedRows, insertId }
 }
 
+export async function withConnection_vc_bb(fn) {
+  const conn = await pool_vc_bb.getConnection();
+  try {
+    const result = await fn(conn);
+    return result;
+  } finally {
+    conn.release();
+  }
+}
+
 export default {
   initDatabase_vc_bb,
   query_vc_bb,
   getOne_vc_bb,
   execute_vc_bb,
+  withConnection_vc_bb,
 };

@@ -74,12 +74,14 @@ export class LockModel_vc_bb {
   }
 
   async limpiarTablas_vc_bb(tablas_vc_bb) {
-    await db_vc_bb.query_vc_bb("SET FOREIGN_KEY_CHECKS = 0");
-    for (const tabla_vc_bb of tablas_vc_bb) {
-      await db_vc_bb.query_vc_bb("CALL sp_delete_all_bb_vc(?)", [tabla_vc_bb]);
-    }
-    await db_vc_bb.query_vc_bb("SET FOREIGN_KEY_CHECKS = 1");
-    return true;
+    return await db_vc_bb.withConnection_vc_bb(async (conn_vc_bb) => {
+      await conn_vc_bb.query("SET FOREIGN_KEY_CHECKS = 0");
+      for (const tabla_vc_bb of tablas_vc_bb) {
+        await conn_vc_bb.query("CALL sp_delete_all_bb_vc(?)", [tabla_vc_bb]);
+      }
+      await conn_vc_bb.query("SET FOREIGN_KEY_CHECKS = 1");
+      return true;
+    });
   }
 
   async restaurarRespaldo_vc_bb(nombreRespaldo_vc_bb, tablas_vc_bb) {

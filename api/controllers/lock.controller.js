@@ -46,9 +46,22 @@ export class LockController_vc_bb {
       if (!confirmar) return res_vc_bb.status(400).json({ mensaje_vc_bb: "Se requiere confirmación para ejecutar el rollback" });
       const tablas_vc_bb = this.lockModel_vc_bb.obtenerTablasPorTipo_vc_bb(tipoCarga);
       if (!tablas_vc_bb.length) return res_vc_bb.status(400).json({ mensaje_vc_bb: `Tipo de carga '${tipoCarga}' no válido` });
-      const nombreRespaldo_vc_bb = await this.lockModel_vc_bb.crearRespaldo_vc_bb(tablas_vc_bb, tipoCarga);
-      await this.lockModel_vc_bb.eliminarRespaldosAntiguosExcepto_vc_bb(tablas_vc_bb, nombreRespaldo_vc_bb);
-      await this.lockModel_vc_bb.limpiarTablas_vc_bb(tablas_vc_bb);
+      let nombreRespaldo_vc_bb;
+      try {
+        nombreRespaldo_vc_bb = await this.lockModel_vc_bb.crearRespaldo_vc_bb(tablas_vc_bb, tipoCarga);
+      } catch (e_vc_bb) {
+        return res_vc_bb.status(500).json({ mensaje_vc_bb: "Error al crear respaldo", error_vc_bb: e_vc_bb.message });
+      }
+      try {
+        await this.lockModel_vc_bb.eliminarRespaldosAntiguosExcepto_vc_bb(tablas_vc_bb, nombreRespaldo_vc_bb);
+      } catch (e_vc_bb) {
+        return res_vc_bb.status(500).json({ mensaje_vc_bb: "Error al depurar respaldos antiguos", error_vc_bb: e_vc_bb.message });
+      }
+      try {
+        await this.lockModel_vc_bb.limpiarTablas_vc_bb(tablas_vc_bb);
+      } catch (e_vc_bb) {
+        return res_vc_bb.status(500).json({ mensaje_vc_bb: "Error al limpiar tablas", error_vc_bb: e_vc_bb.message });
+      }
       res_vc_bb.json({
         mensaje_vc_bb: `Rollback ejecutado exitosamente para ${tipoCarga}`,
         tipoCarga_vc_bb: tipoCarga,

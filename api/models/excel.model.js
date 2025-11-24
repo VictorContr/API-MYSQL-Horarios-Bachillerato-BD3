@@ -145,6 +145,8 @@ export class ExcelModel_vc_bb {
           result_vc_bb.errors_vc_bb.push(`Fila ${i_vc_bb + 1}: Error - ${rowError_vc_bb.message}`);
         }
       }
+    } catch (e_vc_bb) {
+      result_vc_bb.errors_vc_bb.push(e_vc_bb.message || "Error procesando archivo.");
     } finally {
       if (filePath_vc_bb && fs_vc_bb.existsSync(filePath_vc_bb)) {
         try { fs_vc_bb.unlinkSync(filePath_vc_bb); } catch {}
@@ -200,6 +202,8 @@ export class ExcelModel_vc_bb {
           }
         }
       }
+    } catch (e_vc_bb) {
+      result_vc_bb.errors_vc_bb.push(e_vc_bb.message || "Error procesando archivo.");
     } finally {
       if (filePath_vc_bb && fs_vc_bb.existsSync(filePath_vc_bb)) {
         try { fs_vc_bb.unlinkSync(filePath_vc_bb); } catch {}
