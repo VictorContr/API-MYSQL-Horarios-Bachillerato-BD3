@@ -6,6 +6,8 @@ import { config as dotenvConfig } from "dotenv";
 import { initDatabase_vc_bb } from "./api/db.js";
 import usuariosRoutes_vc_bb from "./routes/usuarios.routes.js";
 import loginRoutes_vc_bb from "./routes/login.routes.js";
+import excelGradosRouter_vc_bb, { routerSeccionesExcel_vc_bb, routerPensumExcel_vc_bb } from "./routes/excel.routes.js";
+import lockRoutes_vc_bb from "./routes/lock.routes.js";
 
 dotenvConfig();
 
@@ -19,6 +21,10 @@ app_vc_bb.use(cors());
 
 app_vc_bb.use("/api/usuarios", usuariosRoutes_vc_bb);
 app_vc_bb.use("/api/login", loginRoutes_vc_bb);
+app_vc_bb.use("/api/grados/excel", excelGradosRouter_vc_bb);
+app_vc_bb.use("/api/secciones/excel", routerSeccionesExcel_vc_bb);
+app_vc_bb.use("/api/pensum/excel", routerPensumExcel_vc_bb);
+app_vc_bb.use("/api/lock", lockRoutes_vc_bb);
 
 app_vc_bb.get("/", (req, res) => {
   res.json({ status: "API MySQL operativa" });

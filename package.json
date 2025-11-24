@@ -16,7 +16,10 @@
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "morgan": "^1.10.1",
-    "mysql2": "^3.9.7"
+    "mysql2": "^3.9.7",
+    "excel4node": "^1.8.2",
+    "xlsx-populate": "^1.21.0",
+    "multer": "^2.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
