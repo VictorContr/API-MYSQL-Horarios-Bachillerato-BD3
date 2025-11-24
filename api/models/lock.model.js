@@ -51,7 +51,7 @@ export class LockModel_vc_bb {
     const suffix_vc_bb = `${nombreRespaldo_vc_bb}_${yyyy_vc_bb}${mm_vc_bb}${dd_vc_bb}_${hh_vc_bb}${mi_vc_bb}${ss_vc_bb}_${ms_vc_bb}`.replace(/[^A-Za-z0-9_]/g, "_");
 
     for (const tabla_vc_bb of tablas_vc_bb) {
-      await db_vc_bb.query_vc_bb("CALL sp_backup_table(?, ?)", [tabla_vc_bb, suffix_vc_bb]);
+      await db_vc_bb.query_vc_bb("CALL sp_backup_table_bb_vc(?, ?)", [tabla_vc_bb, suffix_vc_bb]);
     }
     return suffix_vc_bb;
   }
@@ -76,7 +76,7 @@ export class LockModel_vc_bb {
   async limpiarTablas_vc_bb(tablas_vc_bb) {
     await db_vc_bb.query_vc_bb("SET FOREIGN_KEY_CHECKS = 0");
     for (const tabla_vc_bb of tablas_vc_bb) {
-      await db_vc_bb.query_vc_bb("CALL sp_delete_all(?)", [tabla_vc_bb]);
+      await db_vc_bb.query_vc_bb("CALL sp_delete_all_bb_vc(?)", [tabla_vc_bb]);
     }
     await db_vc_bb.query_vc_bb("SET FOREIGN_KEY_CHECKS = 1");
     return true;
@@ -85,7 +85,7 @@ export class LockModel_vc_bb {
   async restaurarRespaldo_vc_bb(nombreRespaldo_vc_bb, tablas_vc_bb) {
     await db_vc_bb.query_vc_bb("SET FOREIGN_KEY_CHECKS = 0");
     for (const tabla_vc_bb of tablas_vc_bb) {
-      await db_vc_bb.query_vc_bb("CALL sp_restore_from_backup(?, ?)", [tabla_vc_bb, nombreRespaldo_vc_bb]);
+      await db_vc_bb.query_vc_bb("CALL sp_restore_from_backup_bb_vc(?, ?)", [tabla_vc_bb, nombreRespaldo_vc_bb]);
     }
     await db_vc_bb.query_vc_bb("SET FOREIGN_KEY_CHECKS = 1");
     return true;

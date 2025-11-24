@@ -110,6 +110,13 @@ export class ExcelModel_vc_bb {
       if (!rows_vc_bb || rows_vc_bb.length < 2) {
         throw new Error("El archivo está vacío o no tiene formato válido.");
       }
+      const headerRow_vc_bb = rows_vc_bb[0] || [];
+      const normalize_vc_bb = (s_vc_bb) => String(s_vc_bb || "").toLowerCase().replace(/[ _]/g, "").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const headerIndex_vc_bb = {};
+      headerRow_vc_bb.forEach((h_vc_bb, idx_vc_bb) => {
+        const norm_vc_bb = normalize_vc_bb(h_vc_bb);
+        if (norm_vc_bb) headerIndex_vc_bb[norm_vc_bb] = idx_vc_bb;
+      });
       for (let i_vc_bb = 1; i_vc_bb < rows_vc_bb.length; i_vc_bb++) {
         const row_vc_bb = rows_vc_bb[i_vc_bb];
         if (!row_vc_bb || row_vc_bb.every((cell_vc_bb) => cell_vc_bb === null || cell_vc_bb === undefined || cell_vc_bb === "")) {
@@ -117,7 +124,14 @@ export class ExcelModel_vc_bb {
         }
         const rowMap_vc_bb = {};
         columns_vc_bb.forEach((col_vc_bb, idx_vc_bb) => {
-          rowMap_vc_bb[col_vc_bb.key_vc_bb] = row_vc_bb[idx_vc_bb];
+          const aliases_vc_bb = Array.isArray(col_vc_bb.aliases_vc_bb) ? col_vc_bb.aliases_vc_bb : [];
+          const candidates_vc_bb = [col_vc_bb.key_vc_bb, ...aliases_vc_bb].map(normalize_vc_bb);
+          let foundIndex_vc_bb = undefined;
+          for (const cand_vc_bb of candidates_vc_bb) {
+            if (cand_vc_bb in headerIndex_vc_bb) { foundIndex_vc_bb = headerIndex_vc_bb[cand_vc_bb]; break; }
+          }
+          const useIdx_vc_bb = foundIndex_vc_bb !== undefined ? foundIndex_vc_bb : idx_vc_bb;
+          rowMap_vc_bb[col_vc_bb.key_vc_bb] = row_vc_bb[useIdx_vc_bb];
         });
         const missing_vc_bb = columns_vc_bb.filter((c_vc_bb) => c_vc_bb.required_vc_bb).filter((c_vc_bb) => !rowMap_vc_bb[c_vc_bb.key_vc_bb]);
         if (missing_vc_bb.length) {
@@ -150,6 +164,13 @@ export class ExcelModel_vc_bb {
           result_vc_bb.errors_vc_bb.push(`Hoja '${sheetCfg_vc_bb.sheetName_vc_bb}': vacía o inválida.`);
           continue;
         }
+        const headerRow_vc_bb = rows_vc_bb[0] || [];
+        const normalize_vc_bb = (s_vc_bb) => String(s_vc_bb || "").toLowerCase().replace(/[ _]/g, "").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        const headerIndex_vc_bb = {};
+        headerRow_vc_bb.forEach((h_vc_bb, idx_vc_bb) => {
+          const norm_vc_bb = normalize_vc_bb(h_vc_bb);
+          if (norm_vc_bb) headerIndex_vc_bb[norm_vc_bb] = idx_vc_bb;
+        });
         for (let i_vc_bb = 1; i_vc_bb < rows_vc_bb.length; i_vc_bb++) {
           const row_vc_bb = rows_vc_bb[i_vc_bb];
           if (!row_vc_bb || row_vc_bb.every((c_vc_bb) => c_vc_bb === null || c_vc_bb === undefined || c_vc_bb === "")) {
@@ -157,7 +178,14 @@ export class ExcelModel_vc_bb {
           }
           const rowMap_vc_bb = {};
           sheetCfg_vc_bb.columns_vc_bb.forEach((col_vc_bb, idx_vc_bb) => {
-            rowMap_vc_bb[col_vc_bb.key_vc_bb] = row_vc_bb[idx_vc_bb];
+            const aliases_vc_bb = Array.isArray(col_vc_bb.aliases_vc_bb) ? col_vc_bb.aliases_vc_bb : [];
+            const candidates_vc_bb = [col_vc_bb.key_vc_bb, ...aliases_vc_bb].map(normalize_vc_bb);
+            let foundIndex_vc_bb = undefined;
+            for (const cand_vc_bb of candidates_vc_bb) {
+              if (cand_vc_bb in headerIndex_vc_bb) { foundIndex_vc_bb = headerIndex_vc_bb[cand_vc_bb]; break; }
+            }
+            const useIdx_vc_bb = foundIndex_vc_bb !== undefined ? foundIndex_vc_bb : idx_vc_bb;
+            rowMap_vc_bb[col_vc_bb.key_vc_bb] = row_vc_bb[useIdx_vc_bb];
           });
           const missing_vc_bb = sheetCfg_vc_bb.columns_vc_bb.filter((c_vc_bb) => c_vc_bb.required_vc_bb).filter((c_vc_bb) => !rowMap_vc_bb[c_vc_bb.key_vc_bb]);
           if (missing_vc_bb.length) {

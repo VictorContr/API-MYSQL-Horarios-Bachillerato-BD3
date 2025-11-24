@@ -209,80 +209,84 @@ async function createSchemaAndSeed_vc_bb() {
   `;
 
   const seedSQL_vc_bb = `
-    INSERT IGNORE INTO td_Rol_bb_vc (rol_bb_vc) VALUES ('Administrador'), ('Profesor');
+    INSERT INTO td_Rol_bb_vc (rol_bb_vc)
+      SELECT 'Administrador' WHERE NOT EXISTS (SELECT 1 FROM td_Rol_bb_vc WHERE rol_bb_vc = 'Administrador');
+    INSERT INTO td_Rol_bb_vc (rol_bb_vc)
+      SELECT 'Profesor' WHERE NOT EXISTS (SELECT 1 FROM td_Rol_bb_vc WHERE rol_bb_vc = 'Profesor');
 
-    INSERT IGNORE INTO td_Usuarios_bb_vc (userName_bb_vc, correo_bb_vc, telefono_bb_vc, nombre_bb_vc, apellido_bb_vc, password_bb_vc)
-    VALUES ('admin', 'admin@colegio.com', '0000000000', 'Admin', 'Principal', '123456');
+    INSERT INTO td_Usuarios_bb_vc (userName_bb_vc, correo_bb_vc, telefono_bb_vc, nombre_bb_vc, apellido_bb_vc, password_bb_vc)
+      SELECT 'admin', 'admin@colegio.com', '0000000000', 'Admin', 'Principal', '123456'
+      WHERE NOT EXISTS (SELECT 1 FROM td_Usuarios_bb_vc WHERE userName_bb_vc = 'admin');
 
-    INSERT IGNORE INTO td_UsuarioRol_bb_vc (ID_usuario_usuarioRol_bb_vc, ID_rol_usuarioRol_bb_vc)
-    SELECT u.ID_usuario_bb_vc, r.ID_rol_bb_vc
-    FROM td_Usuarios_bb_vc u
-    INNER JOIN td_Rol_bb_vc r ON r.rol_bb_vc = 'Administrador'
-    WHERE u.userName_bb_vc = 'admin';
+    INSERT INTO td_UsuarioRol_bb_vc (ID_usuario_usuarioRol_bb_vc, ID_rol_usuarioRol_bb_vc)
+      SELECT u.ID_usuario_bb_vc, r.ID_rol_bb_vc
+      FROM td_Usuarios_bb_vc u JOIN td_Rol_bb_vc r ON r.rol_bb_vc = 'Administrador'
+      WHERE u.userName_bb_vc = 'admin'
+        AND NOT EXISTS (
+          SELECT 1 FROM td_UsuarioRol_bb_vc ur
+          WHERE ur.ID_usuario_usuarioRol_bb_vc = u.ID_usuario_bb_vc AND ur.ID_rol_usuarioRol_bb_vc = r.ID_rol_bb_vc
+        );
 
-    INSERT IGNORE INTO td_Dia_bb_vc (dia_bb_vc) VALUES ('lunes'), ('martes'), ('miércoles'), ('jueves'), ('viernes');
+    INSERT INTO td_Dia_bb_vc (dia_bb_vc) SELECT 'lunes' WHERE NOT EXISTS (SELECT 1 FROM td_Dia_bb_vc WHERE dia_bb_vc = 'lunes');
+    INSERT INTO td_Dia_bb_vc (dia_bb_vc) SELECT 'martes' WHERE NOT EXISTS (SELECT 1 FROM td_Dia_bb_vc WHERE dia_bb_vc = 'martes');
+    INSERT INTO td_Dia_bb_vc (dia_bb_vc) SELECT 'miércoles' WHERE NOT EXISTS (SELECT 1 FROM td_Dia_bb_vc WHERE dia_bb_vc = 'miércoles');
+    INSERT INTO td_Dia_bb_vc (dia_bb_vc) SELECT 'jueves' WHERE NOT EXISTS (SELECT 1 FROM td_Dia_bb_vc WHERE dia_bb_vc = 'jueves');
+    INSERT INTO td_Dia_bb_vc (dia_bb_vc) SELECT 'viernes' WHERE NOT EXISTS (SELECT 1 FROM td_Dia_bb_vc WHERE dia_bb_vc = 'viernes');
 
-    INSERT IGNORE INTO td_Bloque_bb_vc (hora_bloque_bb_vc) VALUES
-      ('7:00 am'), ('8:00 am'), ('9:00 am'), ('10:00 am'), ('11:00 am'),
-      ('12:00 pm'), ('1:00 pm'), ('2:00 pm'), ('3:00 pm'), ('4:00 pm');
+    INSERT INTO td_Bloque_bb_vc (hora_bloque_bb_vc) SELECT '7:00 am' WHERE NOT EXISTS (SELECT 1 FROM td_Bloque_bb_vc WHERE hora_bloque_bb_vc = '7:00 am');
+    INSERT INTO td_Bloque_bb_vc (hora_bloque_bb_vc) SELECT '8:00 am' WHERE NOT EXISTS (SELECT 1 FROM td_Bloque_bb_vc WHERE hora_bloque_bb_vc = '8:00 am');
+    INSERT INTO td_Bloque_bb_vc (hora_bloque_bb_vc) SELECT '9:00 am' WHERE NOT EXISTS (SELECT 1 FROM td_Bloque_bb_vc WHERE hora_bloque_bb_vc = '9:00 am');
+    INSERT INTO td_Bloque_bb_vc (hora_bloque_bb_vc) SELECT '10:00 am' WHERE NOT EXISTS (SELECT 1 FROM td_Bloque_bb_vc WHERE hora_bloque_bb_vc = '10:00 am');
+    INSERT INTO td_Bloque_bb_vc (hora_bloque_bb_vc) SELECT '11:00 am' WHERE NOT EXISTS (SELECT 1 FROM td_Bloque_bb_vc WHERE hora_bloque_bb_vc = '11:00 am');
+    INSERT INTO td_Bloque_bb_vc (hora_bloque_bb_vc) SELECT '12:00 pm' WHERE NOT EXISTS (SELECT 1 FROM td_Bloque_bb_vc WHERE hora_bloque_bb_vc = '12:00 pm');
+    INSERT INTO td_Bloque_bb_vc (hora_bloque_bb_vc) SELECT '1:00 pm' WHERE NOT EXISTS (SELECT 1 FROM td_Bloque_bb_vc WHERE hora_bloque_bb_vc = '1:00 pm');
+    INSERT INTO td_Bloque_bb_vc (hora_bloque_bb_vc) SELECT '2:00 pm' WHERE NOT EXISTS (SELECT 1 FROM td_Bloque_bb_vc WHERE hora_bloque_bb_vc = '2:00 pm');
+    INSERT INTO td_Bloque_bb_vc (hora_bloque_bb_vc) SELECT '3:00 pm' WHERE NOT EXISTS (SELECT 1 FROM td_Bloque_bb_vc WHERE hora_bloque_bb_vc = '3:00 pm');
+    INSERT INTO td_Bloque_bb_vc (hora_bloque_bb_vc) SELECT '4:00 pm' WHERE NOT EXISTS (SELECT 1 FROM td_Bloque_bb_vc WHERE hora_bloque_bb_vc = '4:00 pm');
 
-    INSERT IGNORE INTO td_Grados_bb_vc (nro_grado_bb_vc) VALUES (1), (2), (3), (4), (5);
+    INSERT INTO td_TipoEspacio_bb_vc (tipo_bb_vc) SELECT 'Aula Genérica' WHERE NOT EXISTS (SELECT 1 FROM td_TipoEspacio_bb_vc WHERE tipo_bb_vc = 'Aula Genérica');
+    INSERT INTO td_TipoEspacio_bb_vc (tipo_bb_vc) SELECT 'Espacio Especializado' WHERE NOT EXISTS (SELECT 1 FROM td_TipoEspacio_bb_vc WHERE tipo_bb_vc = 'Espacio Especializado');
 
-    INSERT IGNORE INTO td_Secciones_bb_vc (letra_seccion_bb_vc) VALUES ('A'), ('B'), ('C');
+    INSERT INTO td_Usuarios_bb_vc (userName_bb_vc, correo_bb_vc, telefono_bb_vc, nombre_bb_vc, apellido_bb_vc, password_bb_vc)
+      SELECT 'ana.gomez', 'ana.gomez@mail.com', '1111111', 'Ana', 'Gómez', '123456'
+      WHERE NOT EXISTS (SELECT 1 FROM td_Usuarios_bb_vc WHERE userName_bb_vc = 'ana.gomez');
 
-    INSERT IGNORE INTO td_TipoEspacio_bb_vc (tipo_bb_vc) VALUES ('Aula Genérica'), ('Laboratorio'), ('Cancha');
+    INSERT INTO td_UsuarioRol_bb_vc (ID_usuario_usuarioRol_bb_vc, ID_rol_usuarioRol_bb_vc)
+      SELECT u.ID_usuario_bb_vc, r.ID_rol_bb_vc FROM td_Usuarios_bb_vc u JOIN td_Rol_bb_vc r ON r.rol_bb_vc = 'Profesor'
+      WHERE u.userName_bb_vc = 'ana.gomez'
+        AND NOT EXISTS (
+          SELECT 1 FROM td_UsuarioRol_bb_vc ur WHERE ur.ID_usuario_usuarioRol_bb_vc = u.ID_usuario_bb_vc AND ur.ID_rol_usuarioRol_bb_vc = r.ID_rol_bb_vc
+        );
+    INSERT INTO td_UsuarioRol_bb_vc (ID_usuario_usuarioRol_bb_vc, ID_rol_usuarioRol_bb_vc)
+      SELECT u.ID_usuario_bb_vc, r.ID_rol_bb_vc FROM td_Usuarios_bb_vc u JOIN td_Rol_bb_vc r ON r.rol_bb_vc = 'Profesor'
+      WHERE u.userName_bb_vc = 'luis.perez'
+        AND NOT EXISTS (
+          SELECT 1 FROM td_UsuarioRol_bb_vc ur WHERE ur.ID_usuario_usuarioRol_bb_vc = u.ID_usuario_bb_vc AND ur.ID_rol_usuarioRol_bb_vc = r.ID_rol_bb_vc
+        );
 
-    INSERT IGNORE INTO td_Espacios_bb_vc (nombre_bb_vc, capacidad_bb_vc, ID_TipoEspacio_espacio_bb_vc) VALUES
-      ('Aula 101', 30, 1),
-      ('Aula 102', 30, 1),
-      ('Laboratorio de Química', 25, 2),
-      ('Cancha Principal', 50, 3);
+    INSERT INTO td_Administradores_bb_vc (ID_usuarioRol_admin_bb_vc)
+      SELECT ur.ID_usuarioRol_bb_vc FROM td_UsuarioRol_bb_vc ur JOIN td_Rol_bb_vc r ON r.ID_rol_bb_vc = ur.ID_rol_usuarioRol_bb_vc JOIN td_Usuarios_bb_vc u ON u.ID_usuario_bb_vc = ur.ID_usuario_usuarioRol_bb_vc
+      WHERE r.rol_bb_vc = 'Administrador' AND u.userName_bb_vc = 'admin'
+        AND NOT EXISTS (
+          SELECT 1 FROM td_Administradores_bb_vc a WHERE a.ID_usuarioRol_admin_bb_vc = ur.ID_usuarioRol_bb_vc
+        );
 
-    INSERT IGNORE INTO td_Asignaturas_bb_vc (nombre_bb_vc, horas_academicas_bb_vc, descripcion_bb_vc, duracion_bloque_min_bb_vc, duracion_bloque_max_bb_vc, ID_TipoEspacio_requerido_bb_vc) VALUES
-      ('Matemática', 5, 'Matemática de 1er año', 1, 1, 1),
-      ('Química', 4, 'Química de 3er año', 2, 2, 2),
-      ('Educación Física', 2, 'Deportes', 2, 2, 3);
-
-    INSERT IGNORE INTO td_GradosAsignaturas_bb_vc (ID_grado_gradoAsig_bb_vc, ID_asignatura_gradoAsig_bb_vc) VALUES (1, 1);
-
-    INSERT IGNORE INTO td_GradosAsignaturas_bb_vc (ID_grado_gradoAsig_bb_vc, ID_asignatura_gradoAsig_bb_vc) VALUES (3, 2);
-    INSERT IGNORE INTO td_GradosAsignaturas_bb_vc (ID_grado_gradoAsig_bb_vc, ID_asignatura_gradoAsig_bb_vc) VALUES (3, 3);
-
-    INSERT IGNORE INTO td_Usuarios_bb_vc (userName_bb_vc, correo_bb_vc, telefono_bb_vc, nombre_bb_vc, apellido_bb_vc, password_bb_vc)
-      VALUES ('ana.gomez', 'ana.gomez@mail.com', '1111111', 'Ana', 'Gómez', '123456');
-    INSERT IGNORE INTO td_Usuarios_bb_vc (userName_bb_vc, correo_bb_vc, telefono_bb_vc, nombre_bb_vc, apellido_bb_vc, password_bb_vc)
-      VALUES ('luis.perez', 'luis.perez@mail.com', '2222222', 'Luis', 'Pérez', '123456');
-
-    INSERT IGNORE INTO td_UsuarioRol_bb_vc (ID_usuario_usuarioRol_bb_vc, ID_rol_usuarioRol_bb_vc)
-      SELECT u.ID_usuario_bb_vc, r.ID_rol_bb_vc FROM td_Usuarios_bb_vc u INNER JOIN td_Rol_bb_vc r ON r.rol_bb_vc = 'Profesor' WHERE u.userName_bb_vc = 'ana.gomez';
-    INSERT IGNORE INTO td_UsuarioRol_bb_vc (ID_usuario_usuarioRol_bb_vc, ID_rol_usuarioRol_bb_vc)
-      SELECT u.ID_usuario_bb_vc, r.ID_rol_bb_vc FROM td_Usuarios_bb_vc u INNER JOIN td_Rol_bb_vc r ON r.rol_bb_vc = 'Profesor' WHERE u.userName_bb_vc = 'luis.perez';
-
-    INSERT IGNORE INTO td_Administradores_bb_vc (ID_usuarioRol_admin_bb_vc)
-      SELECT ur.ID_usuarioRol_bb_vc FROM td_UsuarioRol_bb_vc ur INNER JOIN td_Rol_bb_vc r ON r.ID_rol_bb_vc = ur.ID_rol_usuarioRol_bb_vc INNER JOIN td_Usuarios_bb_vc u ON u.ID_usuario_bb_vc = ur.ID_usuario_usuarioRol_bb_vc WHERE r.rol_bb_vc = 'Administrador' AND u.userName_bb_vc = 'admin';
-
-    INSERT IGNORE INTO td_Profesores_bb_vc (ID_usuarioRol_profesor_bb_vc)
-      SELECT ur.ID_usuarioRol_bb_vc FROM td_UsuarioRol_bb_vc ur INNER JOIN td_Usuarios_bb_vc u ON u.ID_usuario_bb_vc = ur.ID_usuario_usuarioRol_bb_vc INNER JOIN td_Rol_bb_vc r ON r.ID_rol_bb_vc = ur.ID_rol_usuarioRol_bb_vc WHERE r.rol_bb_vc = 'Profesor' AND u.userName_bb_vc = 'ana.gomez';
-    INSERT IGNORE INTO td_Profesores_bb_vc (ID_usuarioRol_profesor_bb_vc)
-      SELECT ur.ID_usuarioRol_bb_vc FROM td_UsuarioRol_bb_vc ur INNER JOIN td_Usuarios_bb_vc u ON u.ID_usuario_bb_vc = ur.ID_usuario_usuarioRol_bb_vc INNER JOIN td_Rol_bb_vc r ON r.ID_rol_bb_vc = ur.ID_rol_usuarioRol_bb_vc WHERE r.rol_bb_vc = 'Profesor' AND u.userName_bb_vc = 'luis.perez';
-
-    INSERT IGNORE INTO td_ProfesorAsignaturas_bb_vc (ID_profesor_profAsig_bb_vc, ID_asignatura_profAsig_bb_vc)
-      SELECT p.ID_profesor_bb_vc, a.ID_asignatura_bb_vc FROM td_Profesores_bb_vc p INNER JOIN td_UsuarioRol_bb_vc ur ON ur.ID_usuarioRol_bb_vc = p.ID_usuarioRol_profesor_bb_vc INNER JOIN td_Usuarios_bb_vc u ON u.ID_usuario_bb_vc = ur.ID_usuario_usuarioRol_bb_vc INNER JOIN td_Asignaturas_bb_vc a ON a.nombre_bb_vc = 'Matemática' WHERE u.userName_bb_vc = 'ana.gomez';
-
-    INSERT IGNORE INTO td_ProfesorAsignaturas_bb_vc (ID_profesor_profAsig_bb_vc, ID_asignatura_profAsig_bb_vc)
-      SELECT p.ID_profesor_bb_vc, a.ID_asignatura_bb_vc FROM td_Profesores_bb_vc p INNER JOIN td_UsuarioRol_bb_vc ur ON ur.ID_usuarioRol_bb_vc = p.ID_usuarioRol_profesor_bb_vc INNER JOIN td_Usuarios_bb_vc u ON u.ID_usuario_bb_vc = ur.ID_usuario_usuarioRol_bb_vc INNER JOIN td_Asignaturas_bb_vc a ON a.nombre_bb_vc = 'Química' WHERE u.userName_bb_vc = 'luis.perez';
-    INSERT IGNORE INTO td_ProfesorAsignaturas_bb_vc (ID_profesor_profAsig_bb_vc, ID_asignatura_profAsig_bb_vc)
-      SELECT p.ID_profesor_bb_vc, a.ID_asignatura_bb_vc FROM td_Profesores_bb_vc p INNER JOIN td_UsuarioRol_bb_vc ur ON ur.ID_usuarioRol_bb_vc = p.ID_usuarioRol_profesor_bb_vc INNER JOIN td_Usuarios_bb_vc u ON u.ID_usuario_bb_vc = ur.ID_usuario_usuarioRol_bb_vc INNER JOIN td_Asignaturas_bb_vc a ON a.nombre_bb_vc = 'Educación Física' WHERE u.userName_bb_vc = 'luis.perez';
+    INSERT INTO td_Profesores_bb_vc (ID_usuarioRol_profesor_bb_vc)
+      SELECT ur.ID_usuarioRol_bb_vc FROM td_UsuarioRol_bb_vc ur JOIN td_Usuarios_bb_vc u ON u.ID_usuario_bb_vc = ur.ID_usuario_usuarioRol_bb_vc JOIN td_Rol_bb_vc r ON r.ID_rol_bb_vc = ur.ID_rol_usuarioRol_bb_vc
+      WHERE r.rol_bb_vc = 'Profesor' AND u.userName_bb_vc = 'ana.gomez'
+        AND NOT EXISTS (
+          SELECT 1 FROM td_Profesores_bb_vc p WHERE p.ID_usuarioRol_profesor_bb_vc = ur.ID_usuarioRol_bb_vc
+        );
   `;
 
   const routinesSQL_vc_bb = `
-    DROP FUNCTION IF EXISTS fn_normalize_text;
-    CREATE FUNCTION fn_normalize_text(s VARCHAR(255)) RETURNS VARCHAR(255)
+    DROP FUNCTION IF EXISTS fn_normalize_text_bb_vc;
+    CREATE FUNCTION fn_normalize_text_bb_vc(s VARCHAR(255)) RETURNS VARCHAR(255)
     DETERMINISTIC
     RETURN UPPER(TRIM(s));
 
-    DROP PROCEDURE IF EXISTS sp_upsert_grado;
-    CREATE PROCEDURE sp_upsert_grado(IN p_nro INT)
+    DROP PROCEDURE IF EXISTS sp_upsert_grado_bb_vc;
+    CREATE PROCEDURE sp_upsert_grado_bb_vc(IN p_nro INT)
     BEGIN
       IF p_nro IS NOT NULL THEN
         INSERT INTO td_Grados_bb_vc (nro_grado_bb_vc)
@@ -291,10 +295,10 @@ async function createSchemaAndSeed_vc_bb() {
       END IF;
     END;
 
-    DROP PROCEDURE IF EXISTS sp_upsert_seccion;
-    CREATE PROCEDURE sp_upsert_seccion(IN p_letra VARCHAR(10))
+    DROP PROCEDURE IF EXISTS sp_upsert_seccion_bb_vc;
+    CREATE PROCEDURE sp_upsert_seccion_bb_vc(IN p_letra VARCHAR(10))
     BEGIN
-      SET p_letra = fn_normalize_text(p_letra);
+      SET p_letra = fn_normalize_text_bb_vc(p_letra);
       IF p_letra IS NOT NULL AND p_letra <> '' THEN
         INSERT INTO td_Secciones_bb_vc (letra_seccion_bb_vc)
         VALUES (p_letra)
@@ -306,18 +310,18 @@ async function createSchemaAndSeed_vc_bb() {
     CREATE TRIGGER trg_secciones_before_ins BEFORE INSERT ON td_Secciones_bb_vc
     FOR EACH ROW
     BEGIN
-      SET NEW.letra_seccion_bb_vc = fn_normalize_text(NEW.letra_seccion_bb_vc);
+      SET NEW.letra_seccion_bb_vc = fn_normalize_text_bb_vc(NEW.letra_seccion_bb_vc);
     END;
 
     DROP TRIGGER IF EXISTS trg_secciones_before_upd;
     CREATE TRIGGER trg_secciones_before_upd BEFORE UPDATE ON td_Secciones_bb_vc
     FOR EACH ROW
     BEGIN
-      SET NEW.letra_seccion_bb_vc = fn_normalize_text(NEW.letra_seccion_bb_vc);
+      SET NEW.letra_seccion_bb_vc = fn_normalize_text_bb_vc(NEW.letra_seccion_bb_vc);
     END;
 
-    DROP PROCEDURE IF EXISTS sp_backup_table;
-    CREATE PROCEDURE sp_backup_table(IN p_table VARCHAR(64), IN p_suffix VARCHAR(255))
+    DROP PROCEDURE IF EXISTS sp_backup_table_bb_vc;
+    CREATE PROCEDURE sp_backup_table_bb_vc(IN p_table VARCHAR(64), IN p_suffix VARCHAR(255))
     BEGIN
       SET @backup = CONCAT(p_table, '_backup_', p_suffix);
       SET @sql1 = CONCAT('CREATE TABLE IF NOT EXISTS ', @backup, ' LIKE ', p_table);
@@ -328,15 +332,15 @@ async function createSchemaAndSeed_vc_bb() {
       PREPARE stmt3 FROM @sql3; EXECUTE stmt3; DEALLOCATE PREPARE stmt3;
     END;
 
-    DROP PROCEDURE IF EXISTS sp_delete_all;
-    CREATE PROCEDURE sp_delete_all(IN p_table VARCHAR(64))
+    DROP PROCEDURE IF EXISTS sp_delete_all_bb_vc;
+    CREATE PROCEDURE sp_delete_all_bb_vc(IN p_table VARCHAR(64))
     BEGIN
       SET @sql = CONCAT('DELETE FROM ', p_table);
       PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
     END;
 
-    DROP PROCEDURE IF EXISTS sp_restore_from_backup;
-    CREATE PROCEDURE sp_restore_from_backup(IN p_table VARCHAR(64), IN p_suffix VARCHAR(255))
+    DROP PROCEDURE IF EXISTS sp_restore_from_backup_bb_vc;
+    CREATE PROCEDURE sp_restore_from_backup_bb_vc(IN p_table VARCHAR(64), IN p_suffix VARCHAR(255))
     BEGIN
       SET @backup = CONCAT(p_table, '_backup_', p_suffix);
       SET @exists = (SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = @backup);
@@ -349,11 +353,87 @@ async function createSchemaAndSeed_vc_bb() {
         PREPARE stmt3 FROM @sql3; EXECUTE stmt3; DEALLOCATE PREPARE stmt3;
       END IF;
     END;
+
+    DROP PROCEDURE IF EXISTS sp_seed_defaults_vc_bb;
+    CREATE PROCEDURE sp_seed_defaults_vc_bb()
+    BEGIN
+      INSERT INTO td_Rol_bb_vc (rol_bb_vc)
+      SELECT 'Administrador' WHERE NOT EXISTS (SELECT 1 FROM td_Rol_bb_vc WHERE rol_bb_vc = 'Administrador');
+      INSERT INTO td_Rol_bb_vc (rol_bb_vc)
+      SELECT 'Profesor' WHERE NOT EXISTS (SELECT 1 FROM td_Rol_bb_vc WHERE rol_bb_vc = 'Profesor');
+
+      INSERT INTO td_Usuarios_bb_vc (userName_bb_vc, correo_bb_vc, telefono_bb_vc, nombre_bb_vc, apellido_bb_vc, password_bb_vc)
+      SELECT 'admin', 'admin@colegio.com', '0000000000', 'Admin', 'Principal', '123456'
+      WHERE NOT EXISTS (SELECT 1 FROM td_Usuarios_bb_vc WHERE userName_bb_vc = 'admin');
+
+      INSERT INTO td_UsuarioRol_bb_vc (ID_usuario_usuarioRol_bb_vc, ID_rol_usuarioRol_bb_vc)
+      SELECT u.ID_usuario_bb_vc, r.ID_rol_bb_vc
+      FROM td_Usuarios_bb_vc u JOIN td_Rol_bb_vc r ON r.rol_bb_vc = 'Administrador'
+      WHERE u.userName_bb_vc = 'admin'
+        AND NOT EXISTS (
+          SELECT 1 FROM td_UsuarioRol_bb_vc ur
+          WHERE ur.ID_usuario_usuarioRol_bb_vc = u.ID_usuario_bb_vc AND ur.ID_rol_usuarioRol_bb_vc = r.ID_rol_bb_vc
+        );
+
+      INSERT INTO td_Administradores_bb_vc (ID_usuarioRol_admin_bb_vc)
+      SELECT ur.ID_usuarioRol_bb_vc
+      FROM td_UsuarioRol_bb_vc ur
+      JOIN td_Rol_bb_vc r ON r.ID_rol_bb_vc = ur.ID_rol_usuarioRol_bb_vc
+      JOIN td_Usuarios_bb_vc u ON u.ID_usuario_bb_vc = ur.ID_usuario_usuarioRol_bb_vc
+      WHERE r.rol_bb_vc = 'Administrador' AND u.userName_bb_vc = 'admin'
+        AND NOT EXISTS (
+          SELECT 1 FROM td_Administradores_bb_vc a WHERE a.ID_usuarioRol_admin_bb_vc = ur.ID_usuarioRol_bb_vc
+        );
+
+      INSERT INTO td_Usuarios_bb_vc (userName_bb_vc, correo_bb_vc, telefono_bb_vc, nombre_bb_vc, apellido_bb_vc, password_bb_vc)
+      SELECT 'profe1', 'profesor@colegio.com', '04121234567', 'Carlos', 'Docente', '123456'
+      WHERE NOT EXISTS (SELECT 1 FROM td_Usuarios_bb_vc WHERE userName_bb_vc = 'profe1');
+
+      INSERT INTO td_UsuarioRol_bb_vc (ID_usuario_usuarioRol_bb_vc, ID_rol_usuarioRol_bb_vc)
+      SELECT u.ID_usuario_bb_vc, r.ID_rol_bb_vc
+      FROM td_Usuarios_bb_vc u JOIN td_Rol_bb_vc r ON r.rol_bb_vc = 'Profesor'
+      WHERE u.userName_bb_vc = 'profe1'
+        AND NOT EXISTS (
+          SELECT 1 FROM td_UsuarioRol_bb_vc ur
+          WHERE ur.ID_usuario_usuarioRol_bb_vc = u.ID_usuario_bb_vc AND ur.ID_rol_usuarioRol_bb_vc = r.ID_rol_bb_vc
+        );
+
+      INSERT INTO td_Profesores_bb_vc (ID_usuarioRol_profesor_bb_vc)
+      SELECT ur.ID_usuarioRol_bb_vc
+      FROM td_UsuarioRol_bb_vc ur
+      JOIN td_Usuarios_bb_vc u ON u.ID_usuario_bb_vc = ur.ID_usuario_usuarioRol_bb_vc
+      JOIN td_Rol_bb_vc r ON r.ID_rol_bb_vc = ur.ID_rol_usuarioRol_bb_vc
+      WHERE r.rol_bb_vc = 'Profesor' AND u.userName_bb_vc = 'profe1'
+        AND NOT EXISTS (
+          SELECT 1 FROM td_Profesores_bb_vc p WHERE p.ID_usuarioRol_profesor_bb_vc = ur.ID_usuarioRol_bb_vc
+        );
+
+      INSERT INTO td_Dia_bb_vc (dia_bb_vc) SELECT 'lunes' WHERE NOT EXISTS (SELECT 1 FROM td_Dia_bb_vc WHERE dia_bb_vc = 'lunes');
+      INSERT INTO td_Dia_bb_vc (dia_bb_vc) SELECT 'martes' WHERE NOT EXISTS (SELECT 1 FROM td_Dia_bb_vc WHERE dia_bb_vc = 'martes');
+      INSERT INTO td_Dia_bb_vc (dia_bb_vc) SELECT 'miércoles' WHERE NOT EXISTS (SELECT 1 FROM td_Dia_bb_vc WHERE dia_bb_vc = 'miércoles');
+      INSERT INTO td_Dia_bb_vc (dia_bb_vc) SELECT 'jueves' WHERE NOT EXISTS (SELECT 1 FROM td_Dia_bb_vc WHERE dia_bb_vc = 'jueves');
+      INSERT INTO td_Dia_bb_vc (dia_bb_vc) SELECT 'viernes' WHERE NOT EXISTS (SELECT 1 FROM td_Dia_bb_vc WHERE dia_bb_vc = 'viernes');
+
+      INSERT INTO td_Bloque_bb_vc (hora_bloque_bb_vc) SELECT '7:00 am' WHERE NOT EXISTS (SELECT 1 FROM td_Bloque_bb_vc WHERE hora_bloque_bb_vc = '7:00 am');
+      INSERT INTO td_Bloque_bb_vc (hora_bloque_bb_vc) SELECT '8:00 am' WHERE NOT EXISTS (SELECT 1 FROM td_Bloque_bb_vc WHERE hora_bloque_bb_vc = '8:00 am');
+      INSERT INTO td_Bloque_bb_vc (hora_bloque_bb_vc) SELECT '9:00 am' WHERE NOT EXISTS (SELECT 1 FROM td_Bloque_bb_vc WHERE hora_bloque_bb_vc = '9:00 am');
+      INSERT INTO td_Bloque_bb_vc (hora_bloque_bb_vc) SELECT '10:00 am' WHERE NOT EXISTS (SELECT 1 FROM td_Bloque_bb_vc WHERE hora_bloque_bb_vc = '10:00 am');
+      INSERT INTO td_Bloque_bb_vc (hora_bloque_bb_vc) SELECT '11:00 am' WHERE NOT EXISTS (SELECT 1 FROM td_Bloque_bb_vc WHERE hora_bloque_bb_vc = '11:00 am');
+      INSERT INTO td_Bloque_bb_vc (hora_bloque_bb_vc) SELECT '12:00 pm' WHERE NOT EXISTS (SELECT 1 FROM td_Bloque_bb_vc WHERE hora_bloque_bb_vc = '12:00 pm');
+      INSERT INTO td_Bloque_bb_vc (hora_bloque_bb_vc) SELECT '1:00 pm' WHERE NOT EXISTS (SELECT 1 FROM td_Bloque_bb_vc WHERE hora_bloque_bb_vc = '1:00 pm');
+      INSERT INTO td_Bloque_bb_vc (hora_bloque_bb_vc) SELECT '2:00 pm' WHERE NOT EXISTS (SELECT 1 FROM td_Bloque_bb_vc WHERE hora_bloque_bb_vc = '2:00 pm');
+      INSERT INTO td_Bloque_bb_vc (hora_bloque_bb_vc) SELECT '3:00 pm' WHERE NOT EXISTS (SELECT 1 FROM td_Bloque_bb_vc WHERE hora_bloque_bb_vc = '3:00 pm');
+      INSERT INTO td_Bloque_bb_vc (hora_bloque_bb_vc) SELECT '4:00 pm' WHERE NOT EXISTS (SELECT 1 FROM td_Bloque_bb_vc WHERE hora_bloque_bb_vc = '4:00 pm');
+
+      INSERT INTO td_TipoEspacio_bb_vc (tipo_bb_vc) SELECT 'Aula Genérica' WHERE NOT EXISTS (SELECT 1 FROM td_TipoEspacio_bb_vc WHERE tipo_bb_vc = 'Aula Genérica');
+      INSERT INTO td_TipoEspacio_bb_vc (tipo_bb_vc) SELECT 'Espacio Especializado' WHERE NOT EXISTS (SELECT 1 FROM td_TipoEspacio_bb_vc WHERE tipo_bb_vc = 'Espacio Especializado');
+    END;
   `;
 
   await pool_vc_bb.query(schemaSQL_vc_bb);
   await pool_vc_bb.query(seedSQL_vc_bb);
   await pool_vc_bb.query(routinesSQL_vc_bb);
+  await pool_vc_bb.query('CALL sp_seed_defaults_vc_bb();');
 }
 
 export async function initDatabase_vc_bb() {
