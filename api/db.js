@@ -124,6 +124,17 @@ async function createSchemaAndSeed_vc_bb() {
       UNIQUE KEY unq_seccion_letra (letra_seccion_bb_vc)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+    CREATE TABLE IF NOT EXISTS td_Clases_bb_vc (
+      ID_clase_bb_vc INT AUTO_INCREMENT PRIMARY KEY,
+      ID_grado_clase_bb_vc INT NOT NULL,
+      ID_seccion_clase_bb_vc INT NOT NULL,
+      UNIQUE KEY unq_clase_grado_seccion (ID_grado_clase_bb_vc, ID_seccion_clase_bb_vc),
+      CONSTRAINT fk_clase_grado FOREIGN KEY (ID_grado_clase_bb_vc)
+        REFERENCES td_Grados_bb_vc(ID_grado_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+      CONSTRAINT fk_clase_seccion FOREIGN KEY (ID_seccion_clase_bb_vc)
+        REFERENCES td_Secciones_bb_vc(ID_seccion_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
     CREATE TABLE IF NOT EXISTS td_Asignaturas_bb_vc (
       ID_asignatura_bb_vc INT AUTO_INCREMENT PRIMARY KEY,
       nombre_bb_vc VARCHAR(200) NOT NULL,
@@ -318,6 +329,22 @@ async function createSchemaAndSeed_vc_bb() {
     FOR EACH ROW
     BEGIN
       SET NEW.letra_seccion_bb_vc = fn_normalize_text_bb_vc(NEW.letra_seccion_bb_vc);
+    END;
+
+    DROP TRIGGER IF EXISTS trg_after_insert_grado_vc;
+    CREATE TRIGGER trg_after_insert_grado_vc AFTER INSERT ON td_Grados_bb_vc
+    FOR EACH ROW
+    BEGIN
+      INSERT IGNORE INTO td_Clases_bb_vc (ID_grado_clase_bb_vc, ID_seccion_clase_bb_vc)
+      SELECT NEW.ID_grado_bb_vc, s.ID_seccion_bb_vc FROM td_Secciones_bb_vc s;
+    END;
+
+    DROP TRIGGER IF EXISTS trg_after_insert_seccion_vc;
+    CREATE TRIGGER trg_after_insert_seccion_vc AFTER INSERT ON td_Secciones_bb_vc
+    FOR EACH ROW
+    BEGIN
+      INSERT IGNORE INTO td_Clases_bb_vc (ID_grado_clase_bb_vc, ID_seccion_clase_bb_vc)
+      SELECT g.ID_grado_bb_vc, NEW.ID_seccion_bb_vc FROM td_Grados_bb_vc g;
     END;
 
     DROP PROCEDURE IF EXISTS sp_backup_table_bb_vc;
