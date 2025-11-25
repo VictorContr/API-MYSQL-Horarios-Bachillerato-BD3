@@ -114,13 +114,13 @@ async function createSchemaAndSeed_vc_bb() {
 
     CREATE TABLE IF NOT EXISTS td_Grados_bb_vc (
       ID_grado_bb_vc INT AUTO_INCREMENT PRIMARY KEY,
-      nro_grado_bb_vc INT,
+      nro_grado_bb_vc INT NOT NULL,
       UNIQUE KEY unq_grado_nro (nro_grado_bb_vc)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
     CREATE TABLE IF NOT EXISTS td_Secciones_bb_vc (
       ID_seccion_bb_vc INT AUTO_INCREMENT PRIMARY KEY,
-      letra_seccion_bb_vc VARCHAR(10),
+      letra_seccion_bb_vc VARCHAR(10) NOT NULL,
       UNIQUE KEY unq_seccion_letra (letra_seccion_bb_vc)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -457,9 +457,15 @@ async function createSchemaAndSeed_vc_bb() {
     END;
   `;
 
+  const migrateSQL_vc_bb = `
+    ALTER TABLE td_Grados_bb_vc MODIFY COLUMN nro_grado_bb_vc INT NOT NULL;
+    ALTER TABLE td_Secciones_bb_vc MODIFY COLUMN letra_seccion_bb_vc VARCHAR(10) NOT NULL;
+  `;
+
   await pool_vc_bb.query(schemaSQL_vc_bb);
   await pool_vc_bb.query(seedSQL_vc_bb);
   await pool_vc_bb.query(routinesSQL_vc_bb);
+  await pool_vc_bb.query(migrateSQL_vc_bb);
   await pool_vc_bb.query('CALL sp_seed_defaults_vc_bb();');
 }
 
