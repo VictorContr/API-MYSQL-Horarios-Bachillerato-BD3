@@ -180,17 +180,18 @@ async function createSchemaAndSeed_vc_bb() {
         REFERENCES td_Profesores_bb_vc(ID_profesor_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-    CREATE TABLE IF NOT EXISTS td_DisponibilidadEspacio_bb_vc (
-      ID_DisponibilidadEspacio_bb_vc INT AUTO_INCREMENT PRIMARY KEY,
-      ID_dia_DispEspacio_bb_vc INT,
-      ID_bloque_DispEspacio_bb_vc INT,
-      ID_espacio_DispEspacio_bb_vc INT,
-      CONSTRAINT fk_dispEsp_dia FOREIGN KEY (ID_dia_DispEspacio_bb_vc)
+    CREATE TABLE IF NOT EXISTS td_OcupacionEspacio_bb_vc (
+      ID_OcupacionEspacio_bb_vc INT AUTO_INCREMENT PRIMARY KEY,
+      ID_dia_OcupEspacio_bb_vc INT NOT NULL,
+      ID_bloque_OcupEspacio_bb_vc INT NOT NULL,
+      ID_espacio_OcupEspacio_bb_vc INT NOT NULL,
+      CONSTRAINT fk_ocupEsp_dia FOREIGN KEY (ID_dia_OcupEspacio_bb_vc)
         REFERENCES td_Dia_bb_vc(ID_dia_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
-      CONSTRAINT fk_dispEsp_bloque FOREIGN KEY (ID_bloque_DispEspacio_bb_vc)
+      CONSTRAINT fk_ocupEsp_bloque FOREIGN KEY (ID_bloque_OcupEspacio_bb_vc)
         REFERENCES td_Bloque_bb_vc(ID_bloque_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
-      CONSTRAINT fk_dispEsp_espacio FOREIGN KEY (ID_espacio_DispEspacio_bb_vc)
-        REFERENCES td_Espacios_bb_vc(ID_espacio_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE
+      CONSTRAINT fk_ocupEsp_espacio FOREIGN KEY (ID_espacio_OcupEspacio_bb_vc)
+        REFERENCES td_Espacios_bb_vc(ID_espacio_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+      UNIQUE KEY ux_ocupacion_dia_bloque_espacio (ID_dia_OcupEspacio_bb_vc, ID_bloque_OcupEspacio_bb_vc, ID_espacio_OcupEspacio_bb_vc)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
     CREATE TABLE IF NOT EXISTS td_Horario_bb_vc (
@@ -215,7 +216,10 @@ async function createSchemaAndSeed_vc_bb() {
       CONSTRAINT fk_horario_grado FOREIGN KEY (ID_grado_horario_bb_vc)
         REFERENCES td_Grados_bb_vc(ID_grado_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
       CONSTRAINT fk_horario_seccion FOREIGN KEY (ID_seccion_horario_bb_vc)
-        REFERENCES td_Secciones_bb_vc(ID_seccion_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE
+        REFERENCES td_Secciones_bb_vc(ID_seccion_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
+      UNIQUE KEY ux_horario_espacio_dia_bloque_bb_vc (ID_dia_horario_bb_vc, ID_bloque_horario_bb_vc, ID_espacio_horario_bb_vc),
+      UNIQUE KEY ux_horario_profesor_dia_bloque_bb_vc (ID_dia_horario_bb_vc, ID_bloque_horario_bb_vc, ID_profesor_horario_bb_vc),
+      UNIQUE KEY ux_horario_grupo_dia_bloque_bb_vc (ID_dia_horario_bb_vc, ID_bloque_horario_bb_vc, ID_grado_horario_bb_vc, ID_seccion_horario_bb_vc)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
   `;
 
@@ -455,6 +459,238 @@ async function createSchemaAndSeed_vc_bb() {
       INSERT INTO td_TipoEspacio_bb_vc (tipo_bb_vc) SELECT 'Aula Genérica' WHERE NOT EXISTS (SELECT 1 FROM td_TipoEspacio_bb_vc WHERE tipo_bb_vc = 'Aula Genérica');
       INSERT INTO td_TipoEspacio_bb_vc (tipo_bb_vc) SELECT 'Espacio Especializado' WHERE NOT EXISTS (SELECT 1 FROM td_TipoEspacio_bb_vc WHERE tipo_bb_vc = 'Espacio Especializado');
     END;
+
+    DROP TRIGGER IF EXISTS trg_after_delete_grado_vc;
+    CREATE TRIGGER trg_after_delete_grado_vc AFTER DELETE ON td_Grados_bb_vc
+    FOR EACH ROW
+    BEGIN
+      DELETE FROM td_Clases_bb_vc WHERE ID_grado_clase_bb_vc = OLD.ID_grado_bb_vc;
+    END;
+
+    DROP TRIGGER IF EXISTS trg_after_delete_seccion_vc;
+    CREATE TRIGGER trg_after_delete_seccion_vc AFTER DELETE ON td_Secciones_bb_vc
+    FOR EACH ROW
+    BEGIN
+      DELETE FROM td_Clases_bb_vc WHERE ID_seccion_clase_bb_vc = OLD.ID_seccion_bb_vc;
+    END;
+
+    DROP TRIGGER IF EXISTS trg_reset_horarios_profesor_insert;
+    CREATE TRIGGER trg_reset_horarios_profesor_insert AFTER INSERT ON td_Profesores_bb_vc
+    FOR EACH ROW
+    BEGIN
+      DELETE FROM td_Horario_bb_vc;
+    END;
+
+    DROP TRIGGER IF EXISTS trg_reset_horarios_profesor_update;
+    CREATE TRIGGER trg_reset_horarios_profesor_update AFTER UPDATE ON td_Profesores_bb_vc
+    FOR EACH ROW
+    BEGIN
+      DELETE FROM td_Horario_bb_vc;
+    END;
+
+    DROP TRIGGER IF EXISTS trg_reset_horarios_profesor_delete;
+    CREATE TRIGGER trg_reset_horarios_profesor_delete AFTER DELETE ON td_Profesores_bb_vc
+    FOR EACH ROW
+    BEGIN
+      DELETE FROM td_Horario_bb_vc;
+    END;
+
+    DROP TRIGGER IF EXISTS trg_reset_horarios_asignatura_insert;
+    CREATE TRIGGER trg_reset_horarios_asignatura_insert AFTER INSERT ON td_Asignaturas_bb_vc
+    FOR EACH ROW
+    BEGIN
+      DELETE FROM td_Horario_bb_vc;
+    END;
+
+    DROP TRIGGER IF EXISTS trg_reset_horarios_asignatura_update;
+    CREATE TRIGGER trg_reset_horarios_asignatura_update AFTER UPDATE ON td_Asignaturas_bb_vc
+    FOR EACH ROW
+    BEGIN
+      DELETE FROM td_Horario_bb_vc;
+    END;
+
+    DROP TRIGGER IF EXISTS trg_reset_horarios_asignatura_delete;
+    CREATE TRIGGER trg_reset_horarios_asignatura_delete AFTER DELETE ON td_Asignaturas_bb_vc
+    FOR EACH ROW
+    BEGIN
+      DELETE FROM td_Horario_bb_vc;
+    END;
+
+    DROP TRIGGER IF EXISTS trg_reset_horarios_espacio_insert;
+    CREATE TRIGGER trg_reset_horarios_espacio_insert AFTER INSERT ON td_Espacios_bb_vc
+    FOR EACH ROW
+    BEGIN
+      DELETE FROM td_Horario_bb_vc;
+    END;
+
+    DROP TRIGGER IF EXISTS trg_reset_horarios_espacio_update;
+    CREATE TRIGGER trg_reset_horarios_espacio_update AFTER UPDATE ON td_Espacios_bb_vc
+    FOR EACH ROW
+    BEGIN
+      DELETE FROM td_Horario_bb_vc;
+    END;
+
+    DROP TRIGGER IF EXISTS trg_reset_horarios_espacio_delete;
+    CREATE TRIGGER trg_reset_horarios_espacio_delete AFTER DELETE ON td_Espacios_bb_vc
+    FOR EACH ROW
+    BEGIN
+      DELETE FROM td_Horario_bb_vc;
+    END;
+
+    DROP TRIGGER IF EXISTS trg_reset_horarios_bloque_insert;
+    CREATE TRIGGER trg_reset_horarios_bloque_insert AFTER INSERT ON td_Bloque_bb_vc
+    FOR EACH ROW
+    BEGIN
+      DELETE FROM td_Horario_bb_vc;
+    END;
+
+    DROP TRIGGER IF EXISTS trg_reset_horarios_bloque_update;
+    CREATE TRIGGER trg_reset_horarios_bloque_update AFTER UPDATE ON td_Bloque_bb_vc
+    FOR EACH ROW
+    BEGIN
+      DELETE FROM td_Horario_bb_vc;
+    END;
+
+    DROP TRIGGER IF EXISTS trg_reset_horarios_bloque_delete;
+    CREATE TRIGGER trg_reset_horarios_bloque_delete AFTER DELETE ON td_Bloque_bb_vc
+    FOR EACH ROW
+    BEGIN
+      DELETE FROM td_Horario_bb_vc;
+    END;
+
+    DROP TRIGGER IF EXISTS trg_reset_horarios_grado_insert;
+    CREATE TRIGGER trg_reset_horarios_grado_insert AFTER INSERT ON td_Grados_bb_vc
+    FOR EACH ROW
+    BEGIN
+      DELETE FROM td_Horario_bb_vc;
+    END;
+
+    DROP TRIGGER IF EXISTS trg_reset_horarios_grado_update;
+    CREATE TRIGGER trg_reset_horarios_grado_update AFTER UPDATE ON td_Grados_bb_vc
+    FOR EACH ROW
+    BEGIN
+      DELETE FROM td_Horario_bb_vc;
+    END;
+
+    DROP TRIGGER IF EXISTS trg_reset_horarios_grado_delete;
+    CREATE TRIGGER trg_reset_horarios_grado_delete AFTER DELETE ON td_Grados_bb_vc
+    FOR EACH ROW
+    BEGIN
+      DELETE FROM td_Horario_bb_vc;
+    END;
+
+    DROP TRIGGER IF EXISTS trg_reset_horarios_seccion_insert;
+    CREATE TRIGGER trg_reset_horarios_seccion_insert AFTER INSERT ON td_Secciones_bb_vc
+    FOR EACH ROW
+    BEGIN
+      DELETE FROM td_Horario_bb_vc;
+    END;
+
+    DROP TRIGGER IF EXISTS trg_reset_horarios_seccion_update;
+    CREATE TRIGGER trg_reset_horarios_seccion_update AFTER UPDATE ON td_Secciones_bb_vc
+    FOR EACH ROW
+    BEGIN
+      DELETE FROM td_Horario_bb_vc;
+    END;
+
+    DROP TRIGGER IF EXISTS trg_reset_horarios_seccion_delete;
+    CREATE TRIGGER trg_reset_horarios_seccion_delete AFTER DELETE ON td_Secciones_bb_vc
+    FOR EACH ROW
+    BEGIN
+      DELETE FROM td_Horario_bb_vc;
+    END;
+
+    DROP TRIGGER IF EXISTS trg_reset_horarios_disp_profesor_insert;
+    CREATE TRIGGER trg_reset_horarios_disp_profesor_insert AFTER INSERT ON td_DisponibilidadProfesor_bb_vc
+    FOR EACH ROW
+    BEGIN
+      DELETE FROM td_Horario_bb_vc;
+    END;
+
+    DROP TRIGGER IF EXISTS trg_reset_horarios_disp_profesor_update;
+    CREATE TRIGGER trg_reset_horarios_disp_profesor_update AFTER UPDATE ON td_DisponibilidadProfesor_bb_vc
+    FOR EACH ROW
+    BEGIN
+      DELETE FROM td_Horario_bb_vc;
+    END;
+
+    DROP TRIGGER IF EXISTS trg_reset_horarios_disp_profesor_delete;
+    CREATE TRIGGER trg_reset_horarios_disp_profesor_delete AFTER DELETE ON td_DisponibilidadProfesor_bb_vc
+    FOR EACH ROW
+    BEGIN
+      DELETE FROM td_Horario_bb_vc;
+    END;
+
+    DROP TRIGGER IF EXISTS trg_reset_ocup_espacio_horarios_delete;
+    CREATE TRIGGER trg_reset_ocup_espacio_horarios_delete AFTER DELETE ON td_Horario_bb_vc
+    FOR EACH ROW
+    BEGIN
+      DELETE FROM td_OcupacionEspacio_bb_vc;
+    END;
+
+    DROP VIEW IF EXISTS vista_horarios_admin_bb_vc;
+    CREATE VIEW vista_horarios_admin_bb_vc AS
+    SELECT 
+      h.ID_Horario_bb_vc,
+      d.dia_bb_vc AS dia,
+      b.hora_bloque_bb_vc AS bloque,
+      a.nombre_bb_vc AS asignatura,
+      CONCAT(u.nombre_bb_vc, ' ', u.apellido_bb_vc) AS profesor,
+      g.nro_grado_bb_vc AS grado,
+      s.letra_seccion_bb_vc AS seccion,
+      e.nombre_bb_vc AS espacio
+    FROM td_Horario_bb_vc h
+    JOIN td_Asignaturas_bb_vc a ON h.ID_asignatura_horario_bb_vc = a.ID_asignatura_bb_vc
+    JOIN td_Profesores_bb_vc p ON h.ID_profesor_horario_bb_vc = p.ID_profesor_bb_vc
+    JOIN td_UsuarioRol_bb_vc ur ON p.ID_usuarioRol_profesor_bb_vc = ur.ID_usuarioRol_bb_vc
+    JOIN td_Usuarios_bb_vc u ON ur.ID_usuario_usuarioRol_bb_vc = u.ID_usuario_bb_vc
+    JOIN td_Grados_bb_vc g ON h.ID_grado_horario_bb_vc = g.ID_grado_bb_vc
+    JOIN td_Secciones_bb_vc s ON h.ID_seccion_horario_bb_vc = s.ID_seccion_bb_vc
+    JOIN td_Espacios_bb_vc e ON h.ID_espacio_horario_bb_vc = e.ID_espacio_bb_vc
+    JOIN td_Dia_bb_vc d ON h.ID_dia_horario_bb_vc = d.ID_dia_bb_vc
+    JOIN td_Bloque_bb_vc b ON h.ID_bloque_horario_bb_vc = b.ID_bloque_bb_vc;
+
+    DROP VIEW IF EXISTS vista_horarios_profesor_bb_vc;
+    CREATE VIEW vista_horarios_profesor_bb_vc AS
+    SELECT 
+      h.ID_Horario_bb_vc,
+      d.dia_bb_vc AS dia,
+      b.hora_bloque_bb_vc AS bloque,
+      a.nombre_bb_vc AS asignatura,
+      CONCAT(u.nombre_bb_vc, ' ', u.apellido_bb_vc) AS profesor,
+      g.nro_grado_bb_vc AS grado,
+      s.letra_seccion_bb_vc AS seccion,
+      e.nombre_bb_vc AS espacio,
+      h.ID_profesor_horario_bb_vc AS ID_profesor
+    FROM td_Horario_bb_vc h
+    JOIN td_Asignaturas_bb_vc a ON h.ID_asignatura_horario_bb_vc = a.ID_asignatura_bb_vc
+    JOIN td_Profesores_bb_vc p ON h.ID_profesor_horario_bb_vc = p.ID_profesor_bb_vc
+    JOIN td_UsuarioRol_bb_vc ur ON p.ID_usuarioRol_profesor_bb_vc = ur.ID_usuarioRol_bb_vc
+    JOIN td_Usuarios_bb_vc u ON ur.ID_usuario_usuarioRol_bb_vc = u.ID_usuario_bb_vc
+    JOIN td_Grados_bb_vc g ON h.ID_grado_horario_bb_vc = g.ID_grado_bb_vc
+    JOIN td_Secciones_bb_vc s ON h.ID_seccion_horario_bb_vc = s.ID_seccion_bb_vc
+    JOIN td_Espacios_bb_vc e ON h.ID_espacio_horario_bb_vc = e.ID_espacio_bb_vc
+    JOIN td_Dia_bb_vc d ON h.ID_dia_horario_bb_vc = d.ID_dia_bb_vc
+    JOIN td_Bloque_bb_vc b ON h.ID_bloque_horario_bb_vc = b.ID_bloque_bb_vc;
+
+    DROP VIEW IF EXISTS vista_SlotsEspacio_bb_vc;
+    CREATE VIEW vista_SlotsEspacio_bb_vc AS
+    SELECT d.ID_dia_bb_vc AS ID_dia,
+           b.ID_bloque_bb_vc AS ID_bloque,
+           e.ID_espacio_bb_vc AS ID_espacio
+    FROM td_Dia_bb_vc d
+    CROSS JOIN td_Bloque_bb_vc b
+    CROSS JOIN td_Espacios_bb_vc e;
+
+    DROP VIEW IF EXISTS vista_DisponibilidadRealEspacio_bb_vc;
+    CREATE VIEW vista_DisponibilidadRealEspacio_bb_vc AS
+    SELECT s.ID_dia, s.ID_bloque, s.ID_espacio
+    FROM vista_SlotsEspacio_bb_vc s
+    LEFT JOIN td_OcupacionEspacio_bb_vc o
+      ON o.ID_dia_OcupEspacio_bb_vc = s.ID_dia
+     AND o.ID_bloque_OcupEspacio_bb_vc = s.ID_bloque
+     AND o.ID_espacio_OcupEspacio_bb_vc = s.ID_espacio
+    WHERE o.ID_OcupacionEspacio_bb_vc IS NULL;
   `;
 
   const migrateSQL_vc_bb = `

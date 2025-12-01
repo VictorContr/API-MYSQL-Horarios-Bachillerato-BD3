@@ -33,10 +33,9 @@ export class ExcelController_vc_bb {
         res_vc_bb,
         sheetName_vc_bb: "Grados",
         headers_vc_bb: [
-          { title_vc_bb: "ID", key_vc_bb: "ID_grado_bb_vc" },
           { title_vc_bb: "Grado", key_vc_bb: "nro_grado_bb_vc" },
         ],
-        fetchRows_vc_bb: async () => db_vc_bb.query_vc_bb("SELECT ID_grado_bb_vc, nro_grado_bb_vc FROM td_Grados_bb_vc ORDER BY nro_grado_bb_vc"),
+        fetchRows_vc_bb: async () => db_vc_bb.query_vc_bb("SELECT nro_grado_bb_vc FROM td_Grados_bb_vc ORDER BY nro_grado_bb_vc"),
         filePrefix_vc_bb: "grados"
       });
     } catch (err_vc_bb) {
@@ -75,10 +74,9 @@ export class ExcelController_vc_bb {
         res_vc_bb,
         sheetName_vc_bb: "Secciones",
         headers_vc_bb: [
-          { title_vc_bb: "ID", key_vc_bb: "ID_seccion_bb_vc" },
           { title_vc_bb: "Sección", key_vc_bb: "letra_seccion_bb_vc" },
         ],
-        fetchRows_vc_bb: async () => db_vc_bb.query_vc_bb("SELECT ID_seccion_bb_vc, letra_seccion_bb_vc FROM td_Secciones_bb_vc ORDER BY letra_seccion_bb_vc"),
+        fetchRows_vc_bb: async () => db_vc_bb.query_vc_bb("SELECT letra_seccion_bb_vc FROM td_Secciones_bb_vc ORDER BY letra_seccion_bb_vc"),
       filePrefix_vc_bb: "secciones"
       });
     } catch (err_vc_bb) {
@@ -135,21 +133,19 @@ export class ExcelController_vc_bb {
           {
             sheetName_vc_bb: "Grados",
             headers_vc_bb: [
-              { title_vc_bb: "ID", key_vc_bb: "ID_grado_bb_vc" },
               { title_vc_bb: "Grado", key_vc_bb: "nro_grado_bb_vc" },
             ],
             fetchRows_vc_bb: async () => db_vc_bb.query_vc_bb(
-              "SELECT ID_grado_bb_vc, nro_grado_bb_vc FROM td_Grados_bb_vc ORDER BY nro_grado_bb_vc"
+              "SELECT nro_grado_bb_vc FROM td_Grados_bb_vc ORDER BY nro_grado_bb_vc"
             ),
           },
           {
             sheetName_vc_bb: "Secciones",
             headers_vc_bb: [
-              { title_vc_bb: "ID", key_vc_bb: "ID_seccion_bb_vc" },
               { title_vc_bb: "Sección", key_vc_bb: "letra_seccion_bb_vc" },
             ],
             fetchRows_vc_bb: async () => db_vc_bb.query_vc_bb(
-              "SELECT ID_seccion_bb_vc, letra_seccion_bb_vc FROM td_Secciones_bb_vc ORDER BY letra_seccion_bb_vc"
+              "SELECT letra_seccion_bb_vc FROM td_Secciones_bb_vc ORDER BY letra_seccion_bb_vc"
             ),
           },
         ],
@@ -166,13 +162,12 @@ export class ExcelController_vc_bb {
         res_vc_bb,
         sheetName_vc_bb: "Espacios",
         headers_vc_bb: [
-          { title_vc_bb: "ID", key_vc_bb: "ID_espacio_bb_vc" },
           { title_vc_bb: "Nombre", key_vc_bb: "nombre_bb_vc" },
           { title_vc_bb: "Capacidad", key_vc_bb: "capacidad_bb_vc" },
           { title_vc_bb: "Tipo", key_vc_bb: "tipo_bb_vc" },
         ],
         fetchRows_vc_bb: async () => db_vc_bb.query_vc_bb(
-          "SELECT e.ID_espacio_bb_vc, e.nombre_bb_vc, e.capacidad_bb_vc, t.tipo_bb_vc FROM td_Espacios_bb_vc e LEFT JOIN td_TipoEspacio_bb_vc t ON e.ID_TipoEspacio_espacio_bb_vc = t.ID_TipoEspacio_bb_vc"
+          "SELECT e.nombre_bb_vc, e.capacidad_bb_vc, t.tipo_bb_vc FROM td_Espacios_bb_vc e LEFT JOIN td_TipoEspacio_bb_vc t ON e.ID_TipoEspacio_espacio_bb_vc = t.ID_TipoEspacio_bb_vc"
         ),
         filePrefix_vc_bb: "espacios",
       });
@@ -221,7 +216,6 @@ export class ExcelController_vc_bb {
         res_vc_bb,
         sheetName_vc_bb: "Profesores",
         headers_vc_bb: [
-          { title_vc_bb: "ID", key_vc_bb: "ID_profesor_bb_vc" },
           { title_vc_bb: "Nombre", key_vc_bb: "nombre_bb_vc" },
           { title_vc_bb: "Apellido", key_vc_bb: "apellido_bb_vc" },
           { title_vc_bb: "Correo", key_vc_bb: "correo_bb_vc" },
@@ -229,7 +223,7 @@ export class ExcelController_vc_bb {
           { title_vc_bb: "Asignaturas", key_vc_bb: "asignaturas" },
         ],
         fetchRows_vc_bb: async () => db_vc_bb.query_vc_bb(
-          "SELECT p.ID_profesor_bb_vc, u.nombre_bb_vc, u.apellido_bb_vc, u.correo_bb_vc, u.telefono_bb_vc, COALESCE(GROUP_CONCAT(a.nombre_bb_vc SEPARATOR ' | '), '') AS asignaturas FROM td_Profesores_bb_vc p JOIN td_UsuarioRol_bb_vc ur ON p.ID_usuarioRol_profesor_bb_vc = ur.ID_usuarioRol_bb_vc JOIN td_Usuarios_bb_vc u ON ur.ID_usuario_usuarioRol_bb_vc = u.ID_usuario_bb_vc LEFT JOIN td_ProfesorAsignaturas_bb_vc pa ON pa.ID_profesor_profAsig_bb_vc = p.ID_profesor_bb_vc LEFT JOIN td_Asignaturas_bb_vc a ON pa.ID_asignatura_profAsig_bb_vc = a.ID_asignatura_bb_vc GROUP BY p.ID_profesor_bb_vc, u.nombre_bb_vc, u.apellido_bb_vc, u.correo_bb_vc, u.telefono_bb_vc"
+          "SELECT u.nombre_bb_vc, u.apellido_bb_vc, u.correo_bb_vc, u.telefono_bb_vc, COALESCE(GROUP_CONCAT(a.nombre_bb_vc SEPARATOR ' | '), '') AS asignaturas FROM td_Profesores_bb_vc p JOIN td_UsuarioRol_bb_vc ur ON p.ID_usuarioRol_profesor_bb_vc = ur.ID_usuarioRol_bb_vc JOIN td_Usuarios_bb_vc u ON ur.ID_usuario_usuarioRol_bb_vc = u.ID_usuario_bb_vc LEFT JOIN td_ProfesorAsignaturas_bb_vc pa ON pa.ID_profesor_profAsig_bb_vc = p.ID_profesor_bb_vc LEFT JOIN td_Asignaturas_bb_vc a ON pa.ID_asignatura_profAsig_bb_vc = a.ID_asignatura_bb_vc GROUP BY u.nombre_bb_vc, u.apellido_bb_vc, u.correo_bb_vc, u.telefono_bb_vc"
         ),
         filePrefix_vc_bb: "profesores",
       });
@@ -334,7 +328,6 @@ export class ExcelController_vc_bb {
         res_vc_bb,
         sheetName_vc_bb: "Asignaturas",
         headers_vc_bb: [
-          { title_vc_bb: "ID Asignatura", key_vc_bb: "ID_asignatura_bb_vc" },
           { title_vc_bb: "Asignatura", key_vc_bb: "nombre_bb_vc" },
           { title_vc_bb: "Horas Semanales", key_vc_bb: "horas_academicas_bb_vc" },
           { title_vc_bb: "Descripción", key_vc_bb: "descripcion_bb_vc" },
@@ -344,7 +337,7 @@ export class ExcelController_vc_bb {
           { title_vc_bb: "Grado", key_vc_bb: "nro_grado_bb_vc" },
         ],
         fetchRows_vc_bb: async () => db_vc_bb.query_vc_bb(
-          "SELECT a.ID_asignatura_bb_vc, a.nombre_bb_vc, a.horas_academicas_bb_vc, a.descripcion_bb_vc, a.duracion_bloque_min_bb_vc, a.duracion_bloque_max_bb_vc, te.tipo_bb_vc AS tipo_espacio_requerido_bb_vc, g.nro_grado_bb_vc FROM td_Asignaturas_bb_vc a LEFT JOIN td_GradosAsignaturas_bb_vc ga ON ga.ID_asignatura_gradoAsig_bb_vc = a.ID_asignatura_bb_vc LEFT JOIN td_Grados_bb_vc g ON ga.ID_grado_gradoAsig_bb_vc = g.ID_grado_bb_vc LEFT JOIN td_TipoEspacio_bb_vc te ON a.ID_TipoEspacio_requerido_bb_vc = te.ID_TipoEspacio_bb_vc ORDER BY a.nombre_bb_vc ASC, g.nro_grado_bb_vc ASC"
+          "SELECT a.nombre_bb_vc, a.horas_academicas_bb_vc, a.descripcion_bb_vc, a.duracion_bloque_min_bb_vc, a.duracion_bloque_max_bb_vc, te.tipo_bb_vc AS tipo_espacio_requerido_bb_vc, g.nro_grado_bb_vc FROM td_Asignaturas_bb_vc a LEFT JOIN td_GradosAsignaturas_bb_vc ga ON ga.ID_asignatura_gradoAsig_bb_vc = a.ID_asignatura_bb_vc LEFT JOIN td_Grados_bb_vc g ON ga.ID_grado_gradoAsig_bb_vc = g.ID_grado_bb_vc LEFT JOIN td_TipoEspacio_bb_vc te ON a.ID_TipoEspacio_requerido_bb_vc = te.ID_TipoEspacio_bb_vc ORDER BY a.nombre_bb_vc ASC, g.nro_grado_bb_vc ASC"
         ),
         filePrefix_vc_bb: "asignaturas_grados",
       });
@@ -461,25 +454,12 @@ export class ExcelController_vc_bb {
         {
           sheetName_vc_bb: "DisponibilidadProfesor",
           headers_vc_bb: [
-            { title_vc_bb: "ID", key_vc_bb: "ID_DisponibilidadProfesor_bb_vc" },
             { title_vc_bb: "Día", key_vc_bb: "dia_bb_vc" },
             { title_vc_bb: "Bloque", key_vc_bb: "hora_bloque_bb_vc" },
             { title_vc_bb: "Usuario Profesor", key_vc_bb: "userName_bb_vc" },
           ],
           fetchRows_vc_bb: async () => db_vc_bb.query_vc_bb(
-            "SELECT dp.ID_DisponibilidadProfesor_bb_vc, d.dia_bb_vc, b.hora_bloque_bb_vc, u.userName_bb_vc FROM td_DisponibilidadProfesor_bb_vc dp LEFT JOIN td_Dia_bb_vc d ON dp.ID_dia_DispProfesor_bb_vc = d.ID_dia_bb_vc LEFT JOIN td_Bloque_bb_vc b ON dp.ID_bloque_DispProfesor_bb_vc = b.ID_bloque_bb_vc LEFT JOIN td_Profesores_bb_vc p ON dp.ID_profesor_DispProfesor_bb_vc = p.ID_profesor_bb_vc LEFT JOIN td_UsuarioRol_bb_vc ur ON p.ID_usuarioRol_profesor_bb_vc = ur.ID_usuarioRol_bb_vc LEFT JOIN td_Usuarios_bb_vc u ON ur.ID_usuario_usuarioRol_bb_vc = u.ID_usuario_bb_vc ORDER BY d.dia_bb_vc, b.hora_bloque_bb_vc, u.userName_bb_vc"
-          ),
-        },
-        {
-          sheetName_vc_bb: "DisponibilidadEspacio",
-          headers_vc_bb: [
-            { title_vc_bb: "ID", key_vc_bb: "ID_DisponibilidadEspacio_bb_vc" },
-            { title_vc_bb: "Día", key_vc_bb: "dia_bb_vc" },
-            { title_vc_bb: "Bloque", key_vc_bb: "hora_bloque_bb_vc" },
-            { title_vc_bb: "Nombre Espacio", key_vc_bb: "nombre_bb_vc" },
-          ],
-          fetchRows_vc_bb: async () => db_vc_bb.query_vc_bb(
-            "SELECT de.ID_DisponibilidadEspacio_bb_vc, d.dia_bb_vc, b.hora_bloque_bb_vc, e.nombre_bb_vc FROM td_DisponibilidadEspacio_bb_vc de LEFT JOIN td_Dia_bb_vc d ON de.ID_dia_DispEspacio_bb_vc = d.ID_dia_bb_vc LEFT JOIN td_Bloque_bb_vc b ON de.ID_bloque_DispEspacio_bb_vc = b.ID_bloque_bb_vc LEFT JOIN td_Espacios_bb_vc e ON de.ID_espacio_DispEspacio_bb_vc = e.ID_espacio_bb_vc ORDER BY d.dia_bb_vc, b.hora_bloque_bb_vc, e.nombre_bb_vc"
+            "SELECT d.dia_bb_vc, b.hora_bloque_bb_vc, u.userName_bb_vc FROM td_DisponibilidadProfesor_bb_vc dp LEFT JOIN td_Dia_bb_vc d ON dp.ID_dia_DispProfesor_bb_vc = d.ID_dia_bb_vc LEFT JOIN td_Bloque_bb_vc b ON dp.ID_bloque_DispProfesor_bb_vc = b.ID_bloque_bb_vc LEFT JOIN td_Profesores_bb_vc p ON dp.ID_profesor_DispProfesor_bb_vc = p.ID_profesor_bb_vc LEFT JOIN td_UsuarioRol_bb_vc ur ON p.ID_usuarioRol_profesor_bb_vc = ur.ID_usuarioRol_bb_vc LEFT JOIN td_Usuarios_bb_vc u ON ur.ID_usuario_usuarioRol_bb_vc = u.ID_usuario_bb_vc ORDER BY d.dia_bb_vc, b.hora_bloque_bb_vc, u.userName_bb_vc"
           ),
         },
       ];
@@ -521,32 +501,6 @@ export class ExcelController_vc_bb {
                 await db_vc_bb.execute_vc_bb(
                   "INSERT INTO td_DisponibilidadProfesor_bb_vc (ID_dia_DispProfesor_bb_vc, ID_bloque_DispProfesor_bb_vc, ID_profesor_DispProfesor_bb_vc) VALUES (?, ?, ?)",
                   [dia_vc_bb.ID_dia_bb_vc, bloque_vc_bb.ID_bloque_bb_vc, profesor_vc_bb.id_profesor]
-                );
-              }
-            },
-          },
-          {
-            sheetName_vc_bb: "DisponibilidadEspacio",
-            columns_vc_bb: [
-              { key_vc_bb: "dia_bb_vc", required_vc_bb: true },
-              { key_vc_bb: "hora_bloque_bb_vc", required_vc_bb: true },
-              { key_vc_bb: "nombre_bb_vc", required_vc_bb: true },
-            ],
-            processRow_vc_bb: async ({ dia_bb_vc, hora_bloque_bb_vc, nombre_bb_vc }) => {
-              const dia_vc_bb = await db_vc_bb.getOne_vc_bb("SELECT ID_dia_bb_vc FROM td_Dia_bb_vc WHERE LOWER(dia_bb_vc) = LOWER(?)", [dia_bb_vc]);
-              if (!dia_vc_bb) throw new Error(`Día inválido: '${dia_bb_vc}'`);
-              const bloque_vc_bb = await db_vc_bb.getOne_vc_bb("SELECT ID_bloque_bb_vc FROM td_Bloque_bb_vc WHERE hora_bloque_bb_vc = ?", [hora_bloque_bb_vc]);
-              if (!bloque_vc_bb) throw new Error(`Bloque inválido: '${hora_bloque_bb_vc}'`);
-              const espacio_vc_bb = await db_vc_bb.getOne_vc_bb("SELECT ID_espacio_bb_vc FROM td_Espacios_bb_vc WHERE nombre_bb_vc = ?", [nombre_bb_vc]);
-              if (!espacio_vc_bb) throw new Error(`Espacio no encontrado: '${nombre_bb_vc}'`);
-              const exists_vc_bb = await db_vc_bb.getOne_vc_bb(
-                "SELECT ID_DisponibilidadEspacio_bb_vc FROM td_DisponibilidadEspacio_bb_vc WHERE ID_dia_DispEspacio_bb_vc = ? AND ID_bloque_DispEspacio_bb_vc = ? AND ID_espacio_DispEspacio_bb_vc = ?",
-                [dia_vc_bb.ID_dia_bb_vc, bloque_vc_bb.ID_bloque_bb_vc, espacio_vc_bb.ID_espacio_bb_vc]
-              );
-              if (!exists_vc_bb) {
-                await db_vc_bb.execute_vc_bb(
-                  "INSERT INTO td_DisponibilidadEspacio_bb_vc (ID_dia_DispEspacio_bb_vc, ID_bloque_DispEspacio_bb_vc, ID_espacio_DispEspacio_bb_vc) VALUES (?, ?, ?)",
-                  [dia_vc_bb.ID_dia_bb_vc, bloque_vc_bb.ID_bloque_bb_vc, espacio_vc_bb.ID_espacio_bb_vc]
                 );
               }
             },
