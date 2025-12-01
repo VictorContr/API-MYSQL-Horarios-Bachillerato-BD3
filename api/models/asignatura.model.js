@@ -19,9 +19,15 @@ export class AsignaturaModel_vc_bb {
 
   async obtenerTodos_vc_bb() {
     const sql_vc_bb = `
-      SELECT a.*, te.tipo_bb_vc as tipoEspacio_bb_vc
+      SELECT 
+        a.*,
+        te.tipo_bb_vc AS tipoEspacio_bb_vc,
+        COALESCE(GROUP_CONCAT(g.nro_grado_bb_vc SEPARATOR ' | '), '') AS grados_vc_bb
       FROM td_Asignaturas_bb_vc a
       LEFT JOIN td_TipoEspacio_bb_vc te ON a.ID_TipoEspacio_requerido_bb_vc = te.ID_TipoEspacio_bb_vc
+      LEFT JOIN td_GradosAsignaturas_bb_vc ga ON ga.ID_asignatura_gradoAsig_bb_vc = a.ID_asignatura_bb_vc
+      LEFT JOIN td_Grados_bb_vc g ON ga.ID_grado_gradoAsig_bb_vc = g.ID_grado_bb_vc
+      GROUP BY a.ID_asignatura_bb_vc
       ORDER BY a.nombre_bb_vc
     `;
     return await query_vc_bb(sql_vc_bb);
@@ -90,8 +96,10 @@ export class AsignaturaModel_vc_bb {
 
   async obtenerAsignaturasPorGrado_vc_bb(idGrado_vc_bb) {
     const sql_vc_bb = `
-      SELECT a.* FROM td_Asignaturas_bb_vc a
+      SELECT a.*, te.tipo_bb_vc AS tipoEspacio_bb_vc
+      FROM td_Asignaturas_bb_vc a
       JOIN td_GradosAsignaturas_bb_vc ga ON a.ID_asignatura_bb_vc = ga.ID_asignatura_gradoAsig_bb_vc
+      LEFT JOIN td_TipoEspacio_bb_vc te ON a.ID_TipoEspacio_requerido_bb_vc = te.ID_TipoEspacio_bb_vc
       WHERE ga.ID_grado_gradoAsig_bb_vc = ?
       ORDER BY a.nombre_bb_vc
     `;
@@ -104,7 +112,14 @@ export class AsignaturaModel_vc_bb {
       [idGrado_vc_bb, idAsignatura_vc_bb]
     );
   }
+
+  async desvincularConGrado_vc_bb(idAsignatura_vc_bb, idGrado_vc_bb) {
+    const res_vc_bb = await execute_vc_bb(
+      "DELETE FROM td_GradosAsignaturas_bb_vc WHERE ID_grado_gradoAsig_bb_vc = ? AND ID_asignatura_gradoAsig_bb_vc = ?",
+      [idGrado_vc_bb, idAsignatura_vc_bb]
+    );
+    return res_vc_bb.affectedRows || 0;
+  }
 }
 
 export default AsignaturaModel_vc_bb;
-

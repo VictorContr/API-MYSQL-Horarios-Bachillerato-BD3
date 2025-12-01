@@ -88,10 +88,35 @@ export const getAsignaturasPorGrado_vc_bb = async (req_vc_bb, res_vc_bb) => {
   }
 };
 
+export const quitarGrado_vc_bb = async (req_vc_bb, res_vc_bb) => {
+  try {
+    const { id, nroGrado } = req_vc_bb.params;
+    const asignaturaExistente_vc_bb = await asignaturaModel_vc_bb.obtenerPorId_vc_bb(id);
+    if (!asignaturaExistente_vc_bb) {
+      return res_vc_bb.status(404).json({ mensaje_vc_bb: "Asignatura no encontrada" });
+    }
+
+    const parsed_vc_bb = parseInt(String(nroGrado).trim(), 10);
+    if (!Number.isInteger(parsed_vc_bb)) {
+      return res_vc_bb.status(400).json({ mensaje_vc_bb: "Número de grado inválido" });
+    }
+    const grado_vc_bb = await getOne_vc_bb("SELECT ID_grado_bb_vc FROM td_Grados_bb_vc WHERE nro_grado_bb_vc = ?", [parsed_vc_bb]);
+    if (!grado_vc_bb) {
+      return res_vc_bb.status(404).json({ mensaje_vc_bb: "Grado no encontrado" });
+    }
+
+    const cambios_vc_bb = await asignaturaModel_vc_bb.desvincularConGrado_vc_bb(id, grado_vc_bb.ID_grado_bb_vc);
+    res_vc_bb.json({ mensaje_vc_bb: "Grado desvinculado", cambios_vc_bb });
+  } catch (error_vc_bb) {
+    res_vc_bb.status(500).json({ mensaje_vc_bb: "Error al desvincular grado", error_vc_bb: error_vc_bb.message });
+  }
+};
+
 export default {
   getAllAsignaturas_vc_bb,
   createAsignatura_vc_bb,
   updateAsignatura_vc_bb,
   deleteAsignatura_vc_bb,
   getAsignaturasPorGrado_vc_bb,
+  quitarGrado_vc_bb,
 };

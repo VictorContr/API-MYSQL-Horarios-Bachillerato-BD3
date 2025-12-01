@@ -5,6 +5,7 @@ import {
   updateAsignatura_vc_bb,
   deleteAsignatura_vc_bb,
   getAsignaturasPorGrado_vc_bb,
+  quitarGrado_vc_bb,
 } from "../api/controllers/asignaturas.controller.js";
 import { requireAdmin_vc_bb } from "../middleware/auth.middleware.js";
 
@@ -15,5 +16,6 @@ router_vc_bb.get("/grado/:idGrado", getAsignaturasPorGrado_vc_bb);
 router_vc_bb.post("/", requireAdmin_vc_bb, createAsignatura_vc_bb);
 router_vc_bb.put("/:id", requireAdmin_vc_bb, updateAsignatura_vc_bb);
 router_vc_bb.delete("/:id", requireAdmin_vc_bb, deleteAsignatura_vc_bb);
+router_vc_bb.delete("/:id/grados/:nroGrado", requireAdmin_vc_bb, quitarGrado_vc_bb);
 
 export default router_vc_bb;
