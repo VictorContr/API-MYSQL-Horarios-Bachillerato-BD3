@@ -18,7 +18,7 @@ export class LockModel_vc_bb {
   }
 
   #tablasPorCarga_vc_bb = {
-    profesores: ["td_Profesores_bb_vc"],
+    profesores: ["td_Profesores_bb_vc","td_UsuarioRol_bb_vc","td_Usuarios_bb_vc","td_ProfesorAsignaturas_bb_vc","td_DisponibilidadProfesor_bb_vc"],
     espacios: ["td_Espacios_bb_vc"],
     grados: ["td_Grados_bb_vc"],
     secciones: ["td_Secciones_bb_vc", "td_Grados_bb_vc"],
@@ -80,6 +80,20 @@ export class LockModel_vc_bb {
         await conn_vc_bb.query("CALL sp_delete_all_bb_vc(?)", [tabla_vc_bb]);
       }
       await conn_vc_bb.query("SET FOREIGN_KEY_CHECKS = 1");
+      return true;
+    });
+  }
+
+  async limpiarProfesores_vc_bb() {
+    const rolRow_vc_bb = await db_vc_bb.getOne_vc_bb("SELECT ID_rol_bb_vc FROM td_Rol_bb_vc WHERE rol_bb_vc = 'Profesor' LIMIT 1");
+    const rolProfesorId_vc_bb = rolRow_vc_bb?.ID_rol_bb_vc || 2;
+    return await db_vc_bb.withConnection_vc_bb(async (conn_vc_bb) => {
+      // Eliminar relaciones de usuario-rol para 'Profesor' (esto cascada elimina 'td_Profesores' y dependientes)
+      await conn_vc_bb.query("DELETE FROM td_UsuarioRol_bb_vc WHERE ID_rol_usuarioRol_bb_vc = ?", [rolProfesorId_vc_bb]);
+      // Eliminar usuarios que hayan quedado sin ningún rol
+      await conn_vc_bb.query(
+        "DELETE u FROM td_Usuarios_bb_vc u LEFT JOIN td_UsuarioRol_bb_vc ur ON ur.ID_usuario_usuarioRol_bb_vc = u.ID_usuario_bb_vc WHERE ur.ID_usuario_usuarioRol_bb_vc IS NULL"
+      );
       return true;
     });
   }

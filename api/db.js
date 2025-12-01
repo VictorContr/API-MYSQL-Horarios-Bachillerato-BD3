@@ -51,6 +51,7 @@ async function createSchemaAndSeed_vc_bb() {
     CREATE TABLE IF NOT EXISTS td_Usuarios_bb_vc (
       ID_usuario_bb_vc INT AUTO_INCREMENT PRIMARY KEY,
       userName_bb_vc VARCHAR(80) NOT NULL UNIQUE,
+      cedula_bb_vc VARCHAR(50),
       nombre_bb_vc VARCHAR(120) NOT NULL,
       apellido_bb_vc VARCHAR(120) NOT NULL,
       correo_bb_vc VARCHAR(200) NOT NULL,
@@ -161,6 +162,7 @@ async function createSchemaAndSeed_vc_bb() {
       ID_profesorAsig_bb_vc INT AUTO_INCREMENT PRIMARY KEY,
       ID_profesor_profAsig_bb_vc INT,
       ID_asignatura_profAsig_bb_vc INT,
+      UNIQUE KEY unq_profesor_asignatura (ID_profesor_profAsig_bb_vc, ID_asignatura_profAsig_bb_vc),
       CONSTRAINT fk_profAsig_profesor FOREIGN KEY (ID_profesor_profAsig_bb_vc)
         REFERENCES td_Profesores_bb_vc(ID_profesor_bb_vc) ON DELETE CASCADE ON UPDATE CASCADE,
       CONSTRAINT fk_profAsig_asignatura FOREIGN KEY (ID_asignatura_profAsig_bb_vc)
@@ -460,6 +462,33 @@ async function createSchemaAndSeed_vc_bb() {
       INSERT INTO td_TipoEspacio_bb_vc (tipo_bb_vc) SELECT 'Espacio Especializado' WHERE NOT EXISTS (SELECT 1 FROM td_TipoEspacio_bb_vc WHERE tipo_bb_vc = 'Espacio Especializado');
     END;
 
+    DROP PROCEDURE IF EXISTS sp_add_cedula_column_if_missing_vc_bb;
+    CREATE PROCEDURE sp_add_cedula_column_if_missing_vc_bb()
+    BEGIN
+      SET @exists := (
+        SELECT COUNT(*)
+        FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = 'td_Usuarios_bb_vc'
+          AND COLUMN_NAME = 'cedula_bb_vc'
+      );
+      IF @exists = 0 THEN
+        ALTER TABLE td_Usuarios_bb_vc ADD COLUMN cedula_bb_vc VARCHAR(50) NULL;
+      END IF;
+    END;
+
+    DROP PROCEDURE IF EXISTS sp_add_unique_profesor_asignatura_vc_bb;
+    CREATE PROCEDURE sp_add_unique_profesor_asignatura_vc_bb()
+    BEGIN
+      SET @idx_exists := (
+        SELECT COUNT(*) FROM information_schema.STATISTICS
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'td_ProfesorAsignaturas_bb_vc' AND INDEX_NAME = 'unq_profesor_asignatura'
+      );
+      IF @idx_exists = 0 THEN
+        ALTER TABLE td_ProfesorAsignaturas_bb_vc ADD UNIQUE KEY unq_profesor_asignatura (ID_profesor_profAsig_bb_vc, ID_asignatura_profAsig_bb_vc);
+      END IF;
+    END;
+
     DROP TRIGGER IF EXISTS trg_after_delete_grado_vc;
     CREATE TRIGGER trg_after_delete_grado_vc AFTER DELETE ON td_Grados_bb_vc
     FOR EACH ROW
@@ -621,11 +650,49 @@ async function createSchemaAndSeed_vc_bb() {
       DELETE FROM td_Horario_bb_vc;
     END;
 
-    DROP TRIGGER IF EXISTS trg_reset_ocup_espacio_horarios_delete;
-    CREATE TRIGGER trg_reset_ocup_espacio_horarios_delete AFTER DELETE ON td_Horario_bb_vc
+    DROP TRIGGER IF EXISTS trg_sync_ocupacion_horario_insert;
+    CREATE TRIGGER trg_sync_ocupacion_horario_insert AFTER INSERT ON td_Horario_bb_vc
     FOR EACH ROW
     BEGIN
-      DELETE FROM td_OcupacionEspacio_bb_vc;
+      INSERT IGNORE INTO td_OcupacionEspacio_bb_vc (
+        ID_dia_OcupEspacio_bb_vc,
+        ID_bloque_OcupEspacio_bb_vc,
+        ID_espacio_OcupEspacio_bb_vc
+      ) VALUES (
+        NEW.ID_dia_horario_bb_vc,
+        NEW.ID_bloque_horario_bb_vc,
+        NEW.ID_espacio_horario_bb_vc
+      );
+    END;
+
+    DROP TRIGGER IF EXISTS trg_sync_ocupacion_horario_update;
+    CREATE TRIGGER trg_sync_ocupacion_horario_update AFTER UPDATE ON td_Horario_bb_vc
+    FOR EACH ROW
+    BEGIN
+      DELETE FROM td_OcupacionEspacio_bb_vc
+      WHERE ID_dia_OcupEspacio_bb_vc = OLD.ID_dia_horario_bb_vc
+        AND ID_bloque_OcupEspacio_bb_vc = OLD.ID_bloque_horario_bb_vc
+        AND ID_espacio_OcupEspacio_bb_vc = OLD.ID_espacio_horario_bb_vc;
+
+      INSERT IGNORE INTO td_OcupacionEspacio_bb_vc (
+        ID_dia_OcupEspacio_bb_vc,
+        ID_bloque_OcupEspacio_bb_vc,
+        ID_espacio_OcupEspacio_bb_vc
+      ) VALUES (
+        NEW.ID_dia_horario_bb_vc,
+        NEW.ID_bloque_horario_bb_vc,
+        NEW.ID_espacio_horario_bb_vc
+      );
+    END;
+
+    DROP TRIGGER IF EXISTS trg_sync_ocupacion_horario_delete;
+    CREATE TRIGGER trg_sync_ocupacion_horario_delete AFTER DELETE ON td_Horario_bb_vc
+    FOR EACH ROW
+    BEGIN
+      DELETE FROM td_OcupacionEspacio_bb_vc
+      WHERE ID_dia_OcupEspacio_bb_vc = OLD.ID_dia_horario_bb_vc
+        AND ID_bloque_OcupEspacio_bb_vc = OLD.ID_bloque_horario_bb_vc
+        AND ID_espacio_OcupEspacio_bb_vc = OLD.ID_espacio_horario_bb_vc;
     END;
 
     DROP VIEW IF EXISTS vista_horarios_admin_bb_vc;
@@ -703,6 +770,7 @@ async function createSchemaAndSeed_vc_bb() {
   await pool_vc_bb.query(routinesSQL_vc_bb);
   await pool_vc_bb.query(migrateSQL_vc_bb);
   await pool_vc_bb.query('CALL sp_seed_defaults_vc_bb();');
+  await pool_vc_bb.query('CALL sp_add_cedula_column_if_missing_vc_bb();');
 }
 
 export async function initDatabase_vc_bb() {

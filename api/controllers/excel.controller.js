@@ -220,10 +220,12 @@ export class ExcelController_vc_bb {
           { title_vc_bb: "Apellido", key_vc_bb: "apellido_bb_vc" },
           { title_vc_bb: "Correo", key_vc_bb: "correo_bb_vc" },
           { title_vc_bb: "Teléfono", key_vc_bb: "telefono_bb_vc" },
+          { title_vc_bb: "Usuario", key_vc_bb: "userName_bb_vc" },
+          { title_vc_bb: "Cédula", key_vc_bb: "cedula_bb_vc" },
           { title_vc_bb: "Asignaturas", key_vc_bb: "asignaturas" },
         ],
         fetchRows_vc_bb: async () => db_vc_bb.query_vc_bb(
-          "SELECT u.nombre_bb_vc, u.apellido_bb_vc, u.correo_bb_vc, u.telefono_bb_vc, COALESCE(GROUP_CONCAT(a.nombre_bb_vc SEPARATOR ' | '), '') AS asignaturas FROM td_Profesores_bb_vc p JOIN td_UsuarioRol_bb_vc ur ON p.ID_usuarioRol_profesor_bb_vc = ur.ID_usuarioRol_bb_vc JOIN td_Usuarios_bb_vc u ON ur.ID_usuario_usuarioRol_bb_vc = u.ID_usuario_bb_vc LEFT JOIN td_ProfesorAsignaturas_bb_vc pa ON pa.ID_profesor_profAsig_bb_vc = p.ID_profesor_bb_vc LEFT JOIN td_Asignaturas_bb_vc a ON pa.ID_asignatura_profAsig_bb_vc = a.ID_asignatura_bb_vc GROUP BY u.nombre_bb_vc, u.apellido_bb_vc, u.correo_bb_vc, u.telefono_bb_vc"
+          "SELECT u.nombre_bb_vc, u.apellido_bb_vc, u.correo_bb_vc, u.telefono_bb_vc, u.userName_bb_vc, u.cedula_bb_vc, COALESCE(GROUP_CONCAT(a.nombre_bb_vc SEPARATOR ' | '), '') AS asignaturas FROM td_Profesores_bb_vc p JOIN td_UsuarioRol_bb_vc ur ON p.ID_usuarioRol_profesor_bb_vc = ur.ID_usuarioRol_bb_vc JOIN td_Usuarios_bb_vc u ON ur.ID_usuario_usuarioRol_bb_vc = u.ID_usuario_bb_vc LEFT JOIN td_ProfesorAsignaturas_bb_vc pa ON pa.ID_profesor_profAsig_bb_vc = p.ID_profesor_bb_vc LEFT JOIN td_Asignaturas_bb_vc a ON pa.ID_asignatura_profAsig_bb_vc = a.ID_asignatura_bb_vc GROUP BY u.nombre_bb_vc, u.apellido_bb_vc, u.correo_bb_vc, u.telefono_bb_vc, u.userName_bb_vc, u.cedula_bb_vc"
         ),
         filePrefix_vc_bb: "profesores",
       });
@@ -258,25 +260,28 @@ export class ExcelController_vc_bb {
       const result_vc_bb = await ExcelModel_vc_bb.parseAndProcessExcel_vc_bb({
         filePath_vc_bb,
         columns_vc_bb: [
-          { key_vc_bb: "nombre_bb_vc", required_vc_bb: true },
-          { key_vc_bb: "apellido_bb_vc", required_vc_bb: true },
-          { key_vc_bb: "correo_bb_vc", required_vc_bb: true },
-          { key_vc_bb: "telefono_bb_vc", required_vc_bb: false },
-          { key_vc_bb: "asignaturas", required_vc_bb: false },
+          { key_vc_bb: "nombre_bb_vc", required_vc_bb: true, aliases_vc_bb: ["Nombre"] },
+          { key_vc_bb: "apellido_bb_vc", required_vc_bb: true, aliases_vc_bb: ["Apellido"] },
+          { key_vc_bb: "correo_bb_vc", required_vc_bb: true, aliases_vc_bb: ["Correo"] },
+          { key_vc_bb: "telefono_bb_vc", required_vc_bb: false, aliases_vc_bb: ["Teléfono","Telefono"] },
+          { key_vc_bb: "cedula_bb_vc", required_vc_bb: false, aliases_vc_bb: ["Cédula","Cedula"] },
+          { key_vc_bb: "asignaturas", required_vc_bb: false, aliases_vc_bb: ["Asignaturas"] },
         ],
+        expectedOrderTitles_vc_bb: ["Nombre","Apellido","Correo","Teléfono","Cédula","Asignaturas"],
         processRow_vc_bb: async (rowMap_vc_bb) => {
           const nombre_vc_bb = rowMap_vc_bb.nombre_bb_vc;
           const apellido_vc_bb = rowMap_vc_bb.apellido_bb_vc;
           const correo_vc_bb = rowMap_vc_bb.correo_bb_vc;
           const telefono_vc_bb = rowMap_vc_bb.telefono_bb_vc;
+          const cedula_vc_bb = rowMap_vc_bb.cedula_bb_vc;
           const asignaturasRaw_vc_bb = rowMap_vc_bb.asignaturas;
           const existingUser_vc_bb = await db_vc_bb.getOne_vc_bb("SELECT ID_usuario_bb_vc FROM td_Usuarios_bb_vc WHERE correo_bb_vc = ?", [correo_vc_bb]);
           if (existingUser_vc_bb) throw new Error(`El correo ${correo_vc_bb} ya existe`);
           const userNameGenerado_vc_bb = await generateUsername_vc_bb(nombre_vc_bb, apellido_vc_bb);
           const passwordDefault_vc_bb = "123456";
           const userInsert_vc_bb = await db_vc_bb.execute_vc_bb(
-            "INSERT INTO td_Usuarios_bb_vc (nombre_bb_vc, apellido_bb_vc, correo_bb_vc, telefono_bb_vc, userName_bb_vc, password_bb_vc) VALUES (?, ?, ?, ?, ?, ?)",
-            [String(nombre_vc_bb).trim(), String(apellido_vc_bb).trim(), String(correo_vc_bb).trim(), String(telefono_vc_bb ?? "").trim(), userNameGenerado_vc_bb, passwordDefault_vc_bb]
+            "INSERT INTO td_Usuarios_bb_vc (nombre_bb_vc, apellido_bb_vc, correo_bb_vc, telefono_bb_vc, cedula_bb_vc, userName_bb_vc, password_bb_vc) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            [String(nombre_vc_bb).trim(), String(apellido_vc_bb).trim(), String(correo_vc_bb).trim(), String(telefono_vc_bb ?? "").trim(), String(cedula_vc_bb ?? "").trim(), userNameGenerado_vc_bb, passwordDefault_vc_bb]
           );
           const newUserId_vc_bb = userInsert_vc_bb.insertId;
           const rolProfesorId_vc_bb = await getProfesorRolId_vc_bb();

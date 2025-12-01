@@ -58,7 +58,11 @@ export class LockController_vc_bb {
         return res_vc_bb.status(500).json({ mensaje_vc_bb: "Error al depurar respaldos antiguos", error_vc_bb: e_vc_bb.message });
       }
       try {
-        await this.lockModel_vc_bb.limpiarTablas_vc_bb(tablas_vc_bb);
+        if (tipoCarga === 'profesores') {
+          await this.lockModel_vc_bb.limpiarProfesores_vc_bb();
+        } else {
+          await this.lockModel_vc_bb.limpiarTablas_vc_bb(tablas_vc_bb);
+        }
       } catch (e_vc_bb) {
         return res_vc_bb.status(500).json({ mensaje_vc_bb: "Error al limpiar tablas", error_vc_bb: e_vc_bb.message });
       }

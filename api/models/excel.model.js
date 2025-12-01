@@ -101,7 +101,7 @@ export class ExcelModel_vc_bb {
     }
   }
 
-  static async parseAndProcessExcel_vc_bb({ filePath_vc_bb, columns_vc_bb = [], processRow_vc_bb }) {
+  static async parseAndProcessExcel_vc_bb({ filePath_vc_bb, columns_vc_bb = [], processRow_vc_bb, expectedOrderTitles_vc_bb = [] }) {
     const result_vc_bb = { successfulImports_vc_bb: 0, errors_vc_bb: [] };
     try {
       const workbook_vc_bb = await XlsxPopulate_vc_bb.fromFileAsync(filePath_vc_bb);
@@ -117,6 +117,14 @@ export class ExcelModel_vc_bb {
         const norm_vc_bb = normalize_vc_bb(h_vc_bb);
         if (norm_vc_bb) headerIndex_vc_bb[norm_vc_bb] = idx_vc_bb;
       });
+      if (Array.isArray(expectedOrderTitles_vc_bb) && expectedOrderTitles_vc_bb.length > 0) {
+        const normalizedHeaders_vc_bb = headerRow_vc_bb.map(normalize_vc_bb);
+        const expectedNormalized_vc_bb = expectedOrderTitles_vc_bb.map(normalize_vc_bb);
+        const matchesOrder_vc_bb = expectedNormalized_vc_bb.length <= normalizedHeaders_vc_bb.length && expectedNormalized_vc_bb.every((exp_vc_bb, i_vc_bb) => normalizedHeaders_vc_bb[i_vc_bb] === exp_vc_bb);
+        if (!matchesOrder_vc_bb) {
+          throw new Error(`Encabezados inválidos. Orden requerido: ${expectedOrderTitles_vc_bb.join(', ')}.`);
+        }
+      }
       for (let i_vc_bb = 1; i_vc_bb < rows_vc_bb.length; i_vc_bb++) {
         const row_vc_bb = rows_vc_bb[i_vc_bb];
         if (!row_vc_bb || row_vc_bb.every((cell_vc_bb) => cell_vc_bb === null || cell_vc_bb === undefined || cell_vc_bb === "")) {
