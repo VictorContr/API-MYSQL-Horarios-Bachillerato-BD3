@@ -8,8 +8,8 @@ API básica en MySQL (Express + mysql2) que:
 
 ## Requisitos
 - Node.js 18+ (recomendado en Laragon).
-- MySQL activo (Laragon: `MySQL 5.7/8.x`).
-- Acceso de usuario `root` con clave `3690` (editable en `.env`).
+- Para desarrollo local: MySQL (Laragon: `MySQL 5.7/8.x`) con credenciales en `.env`.
+- Para producción en Railway: usa las variables de entorno provistas por Railway (`MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE`).
 
 ## Estructura del proyecto
 - `api/`
@@ -66,7 +66,9 @@ Seed inicial:
 - Usuario admin: `userName=admin`, `password=123456`.
 
 ## Endpoints
-Base URL: `http://localhost:3300`
+Base URL:
+- Desarrollo: `http://localhost:3300`
+- Producción (Railway): `https://api-mysql-horarios-bachillerato-bd3-production.up.railway.app`
 
 - `POST /api/login`
   - Body:
@@ -103,11 +105,14 @@ Base URL: `http://localhost:3300`
 
 ## Ejemplos rápidos (curl)
 - Login:
-  - `curl -X POST http://localhost:3300/api/login -H "Content-Type: application/json" -d '{"userName_bb_vc":"admin","password_bb_vc":"123456"}'`
+  - Dev: `curl -X POST http://localhost:3300/api/login -H "Content-Type: application/json" -d '{"userName_bb_vc":"admin","password_bb_vc":"123456"}'`
+  - Prod: `curl -X POST https://api-mysql-horarios-bachillerato-bd3-production.up.railway.app/api/login -H "Content-Type: application/json" -d '{"userName_bb_vc":"admin","password_bb_vc":"123456"}'`
 - Crear usuario:
-  - `curl -X POST http://localhost:3300/api/usuarios -H "Content-Type: application/json" -d '{"userName_bb_vc":"profe2","nombre_bb_vc":"Ana","apellido_bb_vc":"Gómez","password_bb_vc":"123456","correo_bb_vc":"ana@mail.com","telefono_bb_vc":"111-1111","rol_bb_vc":"Profesor"}'`
+  - Dev: `curl -X POST http://localhost:3300/api/usuarios -H "Content-Type: application/json" -d '{"userName_bb_vc":"profe2","nombre_bb_vc":"Ana","apellido_bb_vc":"Gómez","password_bb_vc":"123456","correo_bb_vc":"ana@mail.com","telefono_bb_vc":"111-1111","rol_bb_vc":"Profesor"}'`
+  - Prod: `curl -X POST https://api-mysql-horarios-bachillerato-bd3-production.up.railway.app/api/usuarios -H "Content-Type: application/json" -d '{"userName_bb_vc":"profe2","nombre_bb_vc":"Ana","apellido_bb_vc":"Gómez","password_bb_vc":"123456","correo_bb_vc":"ana@mail.com","telefono_bb_vc":"111-1111","rol_bb_vc":"Profesor"}'`
 - Listar usuarios:
-  - `curl http://localhost:3300/api/usuarios`
+  - Dev: `curl http://localhost:3300/api/usuarios`
+  - Prod: `curl https://api-mysql-horarios-bachillerato-bd3-production.up.railway.app/api/usuarios`
 
 ## Notas
 - Seguridad: las contraseñas se guardan en texto plano en esta versión para replicar el flujo actual; se recomienda migrar a `bcrypt` y validar login con hash.
