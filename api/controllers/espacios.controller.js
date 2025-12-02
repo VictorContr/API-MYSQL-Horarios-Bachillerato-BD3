@@ -61,3 +61,8 @@ export default {
   updateEspacio_vc_bb,
   deleteEspacio_vc_bb,
 };
+/*
+EspaciosController (MySQL)
+- Endpoints CRUD de espacios físicos.
+- Filtros por tipo y disponibilidad.
+*/

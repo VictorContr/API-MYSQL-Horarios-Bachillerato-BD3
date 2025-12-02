@@ -1,3 +1,7 @@
+/*
+LoginController (MySQL)
+- login_vc_bb: autentica y retorna datos mínimos + ID_profesor.
+*/
 import LoginModel_vc_bb from "../models/login.model.js";
 import { getOne_vc_bb } from "../db.js";
 

@@ -68,3 +68,8 @@ export default {
   updateGrado_vc_bb,
   deleteGrado_vc_bb,
 };
+/*
+GradosController (MySQL)
+- Endpoints CRUD de grados.
+- Relación con asignaturas y secciones.
+*/

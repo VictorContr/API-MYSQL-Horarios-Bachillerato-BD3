@@ -222,3 +222,8 @@ export class ExcelModel_vc_bb {
 }
 
 export default ExcelModel_vc_bb;
+/*
+ExcelModel (MySQL)
+- Transformaciones para carga masiva desde Excel.
+- Inserción en tablas destino con validación básica.
+*/

@@ -48,4 +48,8 @@ export class EspacioModel_vc_bb {
 }
 
 export default EspacioModel_vc_bb;
-
+/*
+EspaciosModel (MySQL)
+- CRUD de espacios físicos.
+- Validación de tipo y capacidad.
+*/

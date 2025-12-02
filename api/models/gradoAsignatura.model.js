@@ -72,3 +72,8 @@ export class GradoAsignaturaModel_vc_bb {
 }
 
 export default GradoAsignaturaModel_vc_bb;
+/*
+GradoAsignaturaModel (MySQL)
+- Vincula grados con asignaturas.
+- Consultas y mantenimiento de relaciones.
+*/

@@ -1,3 +1,13 @@
+/*
+GeneradorHorariosModel_vc_bb (MySQL)
+- cargarDatos_vc_bb: carga tablas y arma índice de disponibilidad real.
+- validarDisponibilidades_vc_bb: valida días/bloques/espacios y disponibilidades.
+- construirDominios_vc_bb: genera slots candidatos por asignatura.
+- buscarHorario_vc_bb/buscarSoluciones_vc_bb: búsqueda guiada por costo.
+- guardarEnBaseDeDatos_vc_bb: persiste en `td_Horario_bb_vc`.
+- obtenerHorariosPorProfesor_vc_bb/obtenerHorariosLegiblesAdmin_vc_bb: vistas legibles.
+- generarLegibleAdmin_vc_bb: pipeline completo y retorno para admin.
+*/
 import { query_vc_bb, getOne_vc_bb, execute_vc_bb } from "../db.js";
 
 export class GeneradorHorariosModel_vc_bb {

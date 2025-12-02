@@ -1,3 +1,15 @@
+/*
+Clase LockModel_vc_bb
+- #tablasPorCarga_vc_bb: mapea tipos de carga a tablas.
+- obtenerTablasPorTipo_vc_bb: devuelve tablas asociadas al tipo.
+- verificarExistenciaDatos_vc_bb: valida si hay registros en cada tabla.
+- crearRespaldo_vc_bb: genera backups con sufijo temporal único.
+- eliminarRespaldosAntiguosExcepto_vc_bb: borra backups antiguos conservando el indicado.
+- limpiarTablas_vc_bb: vacía tablas de forma segura (desactiva claves foráneas).
+- limpiarProfesores_vc_bb: limpia datos y relaciones de usuarios con rol Profesor.
+- restaurarRespaldo_vc_bb: restaura tablas desde un respaldo determinado.
+- obtenerInfoRespaldos_vc_bb: lista y agrupa respaldos disponibles.
+*/
 import db_vc_bb from "../db.js";
 
 export class LockModel_vc_bb {

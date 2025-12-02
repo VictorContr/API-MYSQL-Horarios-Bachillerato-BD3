@@ -36,3 +36,8 @@ export const obtenerProfesorPorUsuario_vc_bb = async (req_vc_bb, res_vc_bb) => {
 };
 
 export default { generarHorarios_vc_bb, obtenerHorariosProfesor_vc_bb, obtenerProfesorPorUsuario_vc_bb };
+/*
+HorariosController (MySQL)
+- Orquesta generación y consulta de horarios.
+- Endpoints para admin y profesor.
+*/

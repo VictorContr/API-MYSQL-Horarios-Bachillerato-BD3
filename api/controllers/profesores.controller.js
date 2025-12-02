@@ -11,3 +11,8 @@ export const getAllProfesores_vc_bb = async (req_vc_bb, res_vc_bb) => {
 };
 
 export default { getAllProfesores_vc_bb };
+/*
+ProfesoresController (MySQL)
+- Endpoints CRUD de profesores.
+- Vinculación con asignaturas y manejo de disponibilidad.
+*/

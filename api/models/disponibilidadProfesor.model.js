@@ -57,3 +57,8 @@ export class DisponibilidadProfesorModel_vc_bb {
 }
 
 export default DisponibilidadProfesorModel_vc_bb;
+/*
+DisponibilidadProfesorModel (MySQL)
+- CRUD de disponibilidad del docente.
+- Consultas por día/bloque/profesor.
+*/

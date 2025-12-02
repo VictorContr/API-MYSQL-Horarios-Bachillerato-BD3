@@ -1,3 +1,10 @@
+/*
+GradoModel_vc_bb (MySQL)
+- obtenerTodos_vc_bb: lista grados ordenados.
+- obtenerPorId_vc_bb: obtiene grado por ID.
+- existePorNumero_vc_bb: verifica duplicados por número.
+- crear_vc_bb/actualizar_vc_bb/eliminar_vc_bb: CRUD básico.
+*/
 import { query_vc_bb, getOne_vc_bb, execute_vc_bb } from "../db.js";
 
 export class GradoModel_vc_bb {
@@ -49,4 +56,3 @@ export class GradoModel_vc_bb {
 }
 
 export default GradoModel_vc_bb;
-

@@ -120,3 +120,8 @@ export default {
   getAsignaturasPorGrado_vc_bb,
   quitarGrado_vc_bb,
 };
+/*
+AsignaturasController (MySQL)
+- Endpoints CRUD de asignaturas.
+- Vinculación con grados y tipo de espacio.
+*/

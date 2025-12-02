@@ -61,3 +61,8 @@ export default {
   deleteDisponibilidadProfesor_vc_bb,
   updateDisponibilidadProfesor_vc_bb,
 };
+/*
+DisponibilidadController (MySQL)
+- Endpoints para disponibilidad de profesores.
+- Consultas/actualizaciones por día y bloque.
+*/

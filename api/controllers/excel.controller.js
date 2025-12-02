@@ -525,3 +525,8 @@ export class ExcelController_vc_bb {
 
 export const excelController_vc_bb = new ExcelController_vc_bb();
 export default excelController_vc_bb;
+/*
+ExcelController (MySQL)
+- Carga masiva desde Excel.
+- Validación, normalización e inserción de datos.
+*/

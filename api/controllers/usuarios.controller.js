@@ -187,3 +187,8 @@ export default {
   updateUsuario_vc_bb,
   deleteUsuario_vc_bb,
 };
+/*
+UsuariosController (MySQL)
+- Endpoints CRUD de usuarios.
+- Gestión de roles asociados y autenticación básica.
+*/

@@ -90,3 +90,8 @@ export class UsuarioModel_vc_bb {
 }
 
 export default UsuarioModel_vc_bb;
+/*
+UsuarioModel (MySQL)
+- CRUD de usuarios.
+- Búsqueda por credenciales y datos personales.
+*/

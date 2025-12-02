@@ -30,3 +30,8 @@ export class ProfesorModel_vc_bb {
 }
 
 export default ProfesorModel_vc_bb;
+/*
+ProfesoresModel (MySQL)
+- CRUD de profesores.
+- Asignación de materias y vínculo usuario/rol.
+*/

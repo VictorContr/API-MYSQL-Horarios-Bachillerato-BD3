@@ -57,3 +57,8 @@ export class UsuarioRolModel_vc_bb {
 
 export default UsuarioRolModel_vc_bb;
 
+/*
+UsuarioRolModel (MySQL)
+- Gestión de relación usuario–rol.
+- Alta/baja de roles asignados.
+*/
